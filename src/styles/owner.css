@@ -1,0 +1,106 @@
+/* The owner flow on the Connect page: four steps, one black pill at a time, the Agent API's preview before each signature. */
+
+.owner {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.owner-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: owner;
+}
+.owner-steps li {
+  counter-increment: owner;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--color-ink-3);
+}
+.owner-steps li::before {
+  content: counter(owner);
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  background: var(--color-surface-3);
+  color: var(--color-ink-2);
+}
+.owner-steps li[data-done] {
+  color: var(--color-ink);
+}
+.owner-steps li[data-done]::before {
+  content: "";
+  background:
+    no-repeat center / 14px 14px
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E"),
+    var(--color-emerald-v);
+}
+.owner-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.owner-summary {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--color-ink-2);
+  white-space: pre-wrap;
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+.owner-agree {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  color: var(--color-ink);
+  cursor: pointer;
+}
+.owner-agree input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-ink);
+}
+.owner-go {
+  justify-content: flex-start;
+}
+.owner-done {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.owner-id,
+.owner-address {
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.owner-address {
+  margin: 4px 0 6px;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--color-ink);
+}
+.owner-fund .card-sunk {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+.owner-fund .text-action {
+  margin-left: -12px;
+  margin-top: 4px;
+}

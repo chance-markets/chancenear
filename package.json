@@ -1,0 +1,40 @@
+{
+  "name": "chance-lite",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Chance Lite: a pre-execution judge and self-improvement loop for AI agents on the NEAR Intents Agent API, judged by NEAR AI Cloud.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "start": "next start --port ${PORT:-3000}",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "demo": "node --env-file-if-exists=.env.local --import tsx scripts/demo.ts",
+    "attack": "node --env-file-if-exists=.env.local --import tsx scripts/attack.ts",
+    "near:status": "node --env-file-if-exists=.env.local --import tsx scripts/near-status.ts"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@near-intents-agent-api/sdk": "0.9.1",
+    "@simplewebauthn/browser": "14.0.0",
+    "next": "16.3.6",
+    "postgres": "3.4.9",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "server-only": "0.0.1",
+    "viem": "2.56.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "26.6.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "tailwindcss": "4.3.3",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3"
+  }
+}

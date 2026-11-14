@@ -1,0 +1,1086 @@
+@import "tailwindcss";
+@import "../styles/frame.css";
+@import "../styles/lite.css";
+@import "../styles/owner.css";
+
+/*
+ * Chance Lite on the Chance kit (Star Puffs in the chance.cc world), as in Chance Bunker, ported from ChanceBot's kit.css.
+ *
+ * 1. One page grey, white cards: tone separates things, never a border or a shadow.
+ * 2. Ultramarine belongs to Chance: the word, the Guide, "Sign in with Chance". Never Send, a generic button, a link
+ *    or a focus ring.
+ * 3. Every button is a pill: one black pill is the action on a view, a second is tonal or words. Buttons never move
+ *    on hover; press scales to .972.
+ * 4. Type is big and there's little of it. 14 is the floor. Amounts are tabular. No caps labels, no kickers.
+ * 5. A puff replaces explanation. Bare, always.
+ * 6. Things are filled, directions are drawn.
+ * Shadows only on what floats (toast, menu, tab thumb) and dialogs, tight and navy-tinted.
+ *
+ * Dark: every colour is light-dark(light, dark), and <html data-theme> sets the color-scheme that picks one (the
+ * Appearance setting). The dark page is a warm charcoal, never a blue slate. Tone still separates things: the island
+ * sits a step above the page, and tonal fills lift towards the light instead of sinking. Ink turns light, so whatever
+ * sits on an ink fill (the black pill, a tick) uses on-ink.
+ */
+
+@theme static {
+  --font-sans: var(--font-geist), "Geist", system-ui, -apple-system, sans-serif;
+
+  --color-ink: light-dark(#000000, #f3f3ef);
+  --color-ink-2: light-dark(#3d3d3d, #d4d4cf);
+  --color-ink-3: light-dark(#605f5f, #a5a5a0);
+  --color-hint: light-dark(#6d6d6d, #8e8e89);
+  /* What sits on an ink fill: white on the black pill, near-black on the light one. */
+  --color-on-ink: light-dark(#ffffff, #121211);
+  --color-ink-hover: light-dark(#1f1f1f, #d8d8d3);
+
+  --color-accent-v: #0a01bd;
+  --color-accent-v2: #130f59;
+  --color-accent-bg: light-dark(#dbe7ff, #1b1d3a);
+
+  --color-surface-0: light-dark(#f5f5f5, #0c0c0b);
+  --color-surface-1: light-dark(#ffffff, #161615);
+  --color-surface-2: light-dark(#f2f2f2, #222221);
+  --color-surface-3: light-dark(#ebebeb, #2b2b29);
+  --color-surface-4: light-dark(#e2e2e2, #353533);
+  /* What floats (dialogs, menus, toasts): white, or a step above the island. */
+  --color-raised: light-dark(#ffffff, #1c1c1b);
+  /* A pill resting on a sunk track (a tab's thumb, Max): white, or a lit step above the track. */
+  --color-lift: light-dark(#ffffff, #3c3c3a);
+  --color-lift-hover: light-dark(#e2e2e2, #464644);
+  /* A slider's knob stays light in both. */
+  --color-knob: light-dark(#ffffff, #ecece8);
+
+  --color-edge: light-dark(#ebebeb, #2b2b29);
+  --color-edge-2: light-dark(#dedede, #353533);
+  --color-edge-3: light-dark(#c4c4c4, #4e4e4b);
+
+  --color-rose-v: light-dark(#b0122c, #f29aa3);
+  --color-rose-soft: light-dark(#ffe8ec, #3a1c21);
+  --color-amber-v: light-dark(#8a5300, #e2b15f);
+  --color-emerald-v: light-dark(#047857, #5cc497);
+
+  /* Trading only: long and short. Deep, desaturated, never a fill behind words; quiet tints on the dark page. */
+  --color-long: light-dark(#0b7a52, #5cc497);
+  --color-short: light-dark(#b0122c, #f29aa3);
+  /* Long and short as button fills, with white words in both themes. */
+  --color-long-fill: light-dark(#0b7a52, #0f7d55);
+  --color-long-fill-hover: light-dark(#096845, #0c6c49);
+  --color-short-fill: light-dark(#b0122c, #b3203a);
+  --color-short-fill-hover: light-dark(#970f26, #9c1b32);
+
+  --color-scrim: light-dark(rgba(12, 12, 14, 0.32), rgba(0, 0, 0, 0.62));
+  /* The alpha note: an ink strip on the light page, a lifted strip on the dark one. */
+  --color-banner: light-dark(#000000, #232322);
+
+  --radius-v: 14px;
+  --radius-v2: 26px;
+  --radius-row: 18px;
+  --radius-menu: 20px;
+
+  /* Navy-tinted on the light page; on the dark one black, with the surface's own lip catching the light. */
+  --shadow-float: 0 1px 2px var(--shade-1), 0 3px 8px -4px var(--shade-2), inset 0 0 0 1px var(--lip);
+  --shadow-sheet: 0 2px 4px var(--shade-2), 0 18px 36px -20px var(--shade-3), inset 0 0 0 1px var(--lip);
+}
+
+:root {
+  color-scheme: light;
+  --font-features: "cv03", "cv04", "cv09", "cv11";
+  --shade-1: light-dark(rgba(19, 15, 89, 0.06), rgba(0, 0, 0, 0.4));
+  --shade-2: light-dark(rgba(19, 15, 89, 0.1), rgba(0, 0, 0, 0.5));
+  --shade-3: light-dark(rgba(19, 15, 89, 0.45), rgba(0, 0, 0, 0.7));
+  --lip: light-dark(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.07));
+  --wash-hover: light-dark(rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0.06));
+  --wash-press: light-dark(rgba(0, 0, 0, 0.09), rgba(255, 255, 255, 0.1));
+  --contact: radial-gradient(closest-side, var(--contact-ink), transparent);
+  --contact-ink: light-dark(rgba(19, 15, 89, 0.18), rgba(0, 0, 0, 0.55));
+  --knob-shadow: 0 1px 2px light-dark(rgba(19, 15, 89, 0.22), rgba(0, 0, 0, 0.55)),
+    0 2px 5px -2px light-dark(rgba(19, 15, 89, 0.3), rgba(0, 0, 0, 0.6));
+  --pill: 48px;
+  --pill-lg: 52px;
+  --pill-sm: 36px;
+  --field-h: 52px;
+  --row-h: 64px;
+  --place-h: 42px;
+  --sidebar-w: 236px;
+  --inset: 10px;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --spring: cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+/* The Appearance setting. "system" follows the device, and changes with it. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+:root[data-theme="system"] {
+  color-scheme: light dark;
+}
+
+@layer base {
+  html {
+    font-size: 16px;
+    font-family: var(--font-sans);
+    font-feature-settings: var(--font-features);
+    -webkit-font-smoothing: antialiased;
+    color: var(--color-ink-2);
+    background: var(--color-surface-0);
+  }
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background: var(--color-surface-0);
+    color: var(--color-ink-2);
+  }
+  ::selection {
+    background: light-dark(rgba(0, 0, 0, 0.12), rgba(255, 255, 255, 0.2));
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-edge-3);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  button {
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .num,
+  .amount {
+    font-variant-numeric: tabular-nums;
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ── type ── */
+  .t-question {
+    font-size: 44px;
+    line-height: 1.12;
+    font-weight: 400;
+    letter-spacing: -0.035em;
+    color: var(--color-ink);
+  }
+  .t-title {
+    font-size: 28px;
+    line-height: 1.2;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    color: var(--color-ink);
+  }
+  .t-line {
+    font-size: 18px;
+    line-height: 1.45;
+    letter-spacing: -0.005em;
+    color: var(--color-ink-3);
+  }
+  .t-name {
+    font-size: 20px;
+    line-height: 1.3;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+  }
+  .t-label {
+    font-size: 16px;
+    line-height: 1.35;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+  }
+  .t-body {
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--color-ink-2);
+  }
+  .t-small {
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--color-ink-3);
+  }
+  .chance {
+    color: var(--color-accent-v);
+  }
+  .loss {
+    color: var(--color-rose-v);
+  }
+  .is-long {
+    color: var(--color-long);
+  }
+  .is-short {
+    color: var(--color-short);
+  }
+  .link {
+    color: var(--color-ink);
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    text-decoration-color: light-dark(rgba(0, 0, 0, 0.28), rgba(255, 255, 255, 0.32));
+    transition: text-decoration-color 0.18s ease;
+  }
+  .link:hover {
+    text-decoration-color: var(--color-ink);
+  }
+
+  /* The Chance wordmark: its artwork as a mask, filled with ink. */
+  .wordmark {
+    display: inline-block;
+    flex: none;
+    background: var(--color-ink);
+    -webkit-mask: url("/brand/logo-dark.png") center / contain no-repeat;
+    mask: url("/brand/logo-dark.png") center / contain no-repeat;
+  }
+
+  /* ── puffs ── */
+  .puff {
+    position: relative;
+    display: inline-block;
+    flex: none;
+    width: var(--s, 40px);
+    height: var(--s, 40px);
+    vertical-align: middle;
+  }
+  .puff > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  .stand {
+    isolation: isolate;
+  }
+  .stand::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 4.5%;
+    width: 46%;
+    height: 7%;
+    transform: translateX(-50%);
+    background: var(--contact);
+    z-index: -1;
+  }
+  .stand > img {
+    position: relative;
+    z-index: 1;
+  }
+  .puff-stack {
+    display: inline-flex;
+    align-items: center;
+    flex: none;
+  }
+  .puff-stack > img {
+    position: relative;
+    display: block;
+    margin-left: -10px;
+    object-fit: contain;
+  }
+  .puff-stack > img:first-child {
+    margin-left: 0;
+  }
+
+  /* ── buttons ── */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: var(--pill);
+    padding: 0 24px;
+    border-radius: 999px;
+    white-space: nowrap;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1;
+    user-select: none;
+    text-decoration: none;
+    transition:
+      background-color 0.18s ease,
+      color 0.18s ease;
+  }
+  .pill:active {
+    transform: scale(0.972);
+  }
+  .pill > svg {
+    width: 18px;
+    height: 18px;
+    flex: none;
+  }
+  .pill-lg {
+    height: var(--pill-lg);
+    padding: 0 28px;
+    font-size: 17px;
+  }
+  .pill-sm {
+    height: var(--pill-sm);
+    padding: 0 16px;
+    font-size: 15px;
+    gap: 8px;
+  }
+  .pill-sm > svg {
+    width: 16px;
+    height: 16px;
+  }
+  .pill-ink {
+    background: var(--color-ink);
+    color: var(--color-on-ink);
+  }
+  .pill-ink:hover {
+    background: var(--color-ink-hover);
+  }
+  .pill-chance {
+    background: var(--color-accent-v);
+    color: #fff;
+  }
+  .pill-chance:hover {
+    background: #07019a;
+  }
+  .pill-chance:active {
+    background: var(--color-accent-v2);
+  }
+  .pill-tone {
+    background: var(--color-surface-3);
+    color: var(--color-ink);
+  }
+  .pill-tone:hover {
+    background: var(--color-surface-4);
+  }
+  .pill-long {
+    background: var(--color-long-fill);
+    color: #fff;
+  }
+  .pill-long:hover {
+    background: var(--color-long-fill-hover);
+  }
+  .pill-short {
+    background: var(--color-short-fill);
+    color: #fff;
+  }
+  .pill-short:hover {
+    background: var(--color-short-fill-hover);
+  }
+  .pill-full {
+    width: 100%;
+  }
+  .pill:disabled,
+  .pill[aria-disabled="true"] {
+    background: var(--color-surface-3);
+    color: var(--color-ink-3);
+    cursor: not-allowed;
+    transform: none;
+  }
+  .pill[aria-busy="true"] {
+    cursor: progress;
+  }
+  .spin {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    opacity: 0.9;
+    animation: kit-spin 0.9s linear infinite;
+  }
+  @keyframes kit-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .text-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0 12px;
+    border-radius: 999px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-ink);
+    white-space: nowrap;
+    text-decoration: none;
+    transition: background-color 0.18s ease;
+  }
+  .text-action:hover {
+    background: var(--wash-hover);
+  }
+  .text-action:active {
+    background: var(--wash-press);
+  }
+  .text-action:disabled {
+    color: var(--color-ink-3);
+    background: none;
+    cursor: not-allowed;
+  }
+  .text-action > svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.22s var(--ease);
+  }
+  .text-action.is-quiet {
+    font-weight: 400;
+    color: var(--color-ink-3);
+  }
+  .text-action.is-quiet:hover {
+    color: var(--color-ink);
+  }
+  .text-action.is-back > svg {
+    transform: rotate(0);
+  }
+  .text-action.is-back:hover > svg {
+    transform: translateX(-2px);
+  }
+  .text-action.is-out:hover > svg {
+    transform: translate(1.5px, -1.5px);
+  }
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+  }
+  .icon-btn {
+    width: 36px;
+    height: 36px;
+    flex: none;
+    border-radius: 50%;
+    display: inline-grid;
+    place-items: center;
+    color: var(--color-ink-2);
+    transition:
+      background-color 0.18s ease,
+      color 0.18s ease;
+  }
+  .icon-btn:hover {
+    background: var(--wash-hover);
+    color: var(--color-ink);
+  }
+  .icon-btn > svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* ── fields ── */
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .field-label {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-ink);
+    padding-left: 4px;
+  }
+  .input {
+    height: var(--field-h);
+    width: 100%;
+    border: 0;
+    border-radius: 999px;
+    padding: 0 22px;
+    background: var(--color-surface-2);
+    color: var(--color-ink);
+    font-size: 17px;
+    outline: none;
+    transition: box-shadow 0.18s ease;
+  }
+  .input::placeholder {
+    color: var(--color-hint);
+  }
+  .input:focus {
+    box-shadow: inset 0 0 0 2px var(--color-ink);
+  }
+  .input-wrap {
+    position: relative;
+  }
+  .input-wrap > svg {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    width: 18px;
+    height: 18px;
+    transform: translateY(-50%);
+    color: var(--color-ink-3);
+    pointer-events: none;
+  }
+  .input-wrap > .input {
+    padding-left: 44px;
+  }
+  .field-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 20px;
+    padding-left: 22px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--color-ink-3);
+  }
+  .field-note.is-oops {
+    color: var(--color-rose-v);
+  }
+  .money {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 72px;
+    border-radius: 999px;
+    padding: 0 10px 0 26px;
+    background: var(--color-surface-2);
+  }
+  .money > span {
+    font-size: 32px;
+    font-weight: 500;
+    color: var(--color-ink-3);
+    letter-spacing: -0.02em;
+  }
+  .money input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    outline: none;
+    font-size: 32px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .money input::placeholder {
+    color: var(--color-edge-3);
+  }
+  .money:focus-within {
+    box-shadow: inset 0 0 0 2px var(--color-ink);
+  }
+  .money .pill {
+    flex: none;
+  }
+
+  /* ── choices ── */
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .choices.is-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .choice {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 58px;
+    width: 100%;
+    padding: 10px 16px 10px 14px;
+    border-radius: var(--radius-row);
+    background: var(--color-surface-2);
+    text-align: left;
+    color: var(--color-ink);
+    transition: background-color 0.18s ease;
+  }
+  .choice:hover {
+    background: var(--color-surface-3);
+  }
+  .choice-mark {
+    width: 28px;
+    height: 28px;
+    flex: none;
+    object-fit: contain;
+  }
+  .choice-name {
+    flex: 1;
+    min-width: 0;
+    font-size: 17px;
+    line-height: 1.3;
+  }
+  .choice[aria-checked="true"] .choice-name {
+    font-weight: 500;
+  }
+  .tick {
+    width: 24px;
+    height: 24px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--color-surface-4);
+    display: grid;
+    place-items: center;
+    color: var(--color-on-ink);
+  }
+  .tick svg {
+    width: 14px;
+    height: 14px;
+    opacity: 0;
+  }
+  .choice[aria-checked="true"] .tick {
+    background: var(--color-ink);
+  }
+  .choice[aria-checked="true"] .tick svg {
+    opacity: 1;
+  }
+
+  /* ── rows and facts ── */
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: var(--row-h);
+    padding: 10px 14px;
+    border-radius: var(--radius-row);
+    text-align: left;
+    width: 100%;
+    color: inherit;
+    text-decoration: none;
+  }
+  a.row,
+  button.row {
+    transition: background-color 0.18s ease;
+  }
+  a.row:hover,
+  button.row:hover {
+    background: var(--color-surface-2);
+  }
+  .row-mark {
+    width: 32px;
+    height: 32px;
+    flex: none;
+    display: grid;
+    place-items: center;
+    object-fit: contain;
+  }
+  .row-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .row-name {
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .row-sub {
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--color-ink-3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* A move that stopped says so in the loss tone (.loss alone comes earlier, so the line's grey would win). */
+  .row-sub.loss {
+    color: var(--color-rose-v);
+  }
+  .row-end {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: none;
+  }
+  .row-value {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--color-ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .row-chev {
+    width: 18px;
+    height: 18px;
+    color: var(--color-ink-3);
+    transition: transform 0.22s var(--ease);
+  }
+  a.row:hover .row-chev {
+    transform: translateX(2px);
+  }
+  .facts {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 24px;
+  }
+  .facts dt,
+  .facts dd {
+    margin: 0;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+  }
+  .facts dt {
+    color: var(--color-ink-3);
+  }
+  .facts dd {
+    justify-content: flex-end;
+    font-weight: 500;
+    color: var(--color-ink);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  .facts .is-total {
+    font-size: 17px;
+    color: var(--color-ink);
+  }
+
+  /* ── status in words ── */
+  .say {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    line-height: 1.4;
+    color: var(--color-ink-2);
+  }
+  .say.is-small {
+    font-size: 14px;
+    color: var(--color-ink-3);
+    gap: 6px;
+  }
+  .say.is-stop {
+    color: var(--color-rose-v);
+  }
+  .say.is-done {
+    color: var(--color-emerald-v);
+  }
+  .soon {
+    font-size: 14px;
+    color: var(--color-ink-3);
+  }
+
+  /* ── placeholders ── */
+  .skel {
+    display: inline-block;
+    flex: none;
+    max-width: 100%;
+    vertical-align: middle;
+    border-radius: 8px;
+    background: var(--color-surface-3);
+    animation: skel-pulse 1.6s ease-in-out infinite;
+  }
+  .venue-group .skel,
+  .choice .skel,
+  .card-sunk .skel {
+    background: var(--color-surface-4);
+  }
+  @keyframes skel-pulse {
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  /* ── surfaces ── */
+  .card {
+    background: var(--color-surface-1);
+    border-radius: var(--radius-v2);
+    padding: 28px;
+  }
+  .card-sunk {
+    background: var(--color-surface-2);
+    border-radius: 20px;
+    padding: 18px 20px;
+  }
+  .empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px 32px;
+  }
+  .empty > .t-line {
+    margin-top: 8px;
+    max-width: 420px;
+  }
+  .empty > .pill {
+    margin-top: 22px;
+  }
+  .pane-wait {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-align: center;
+    padding: 24px;
+  }
+
+  /* ── tabs with a sliding thumb ── */
+  .tabs {
+    position: relative;
+    display: inline-flex;
+    gap: 2px;
+    padding: 4px;
+    border-radius: 999px;
+    background: var(--color-surface-2);
+  }
+  .tabs.is-fill {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    width: 100%;
+  }
+  .tab {
+    position: relative;
+    z-index: 1;
+    height: 40px;
+    padding: 0 18px;
+    border-radius: 999px;
+    font-size: 16px;
+    color: var(--color-ink-3);
+    white-space: nowrap;
+    transition: color 0.18s ease;
+  }
+  .tabs.is-sm .tab {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 14px;
+  }
+  .tab:hover {
+    color: var(--color-ink);
+  }
+  .tab[aria-selected="true"],
+  .tab[aria-checked="true"] {
+    color: var(--color-ink);
+    font-weight: 500;
+  }
+  .tab.is-long[aria-checked="true"] {
+    color: var(--color-long);
+  }
+  .tab.is-short[aria-checked="true"] {
+    color: var(--color-short);
+  }
+  .tabs-thumb {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 0;
+    width: 0;
+    border-radius: 999px;
+    background: var(--color-lift);
+    box-shadow: var(--shadow-float);
+    transition:
+      transform 0.32s var(--ease),
+      width 0.32s var(--ease);
+    pointer-events: none;
+  }
+
+  /* ── floating things ── */
+  .toast {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 56px;
+    max-width: min(520px, calc(100vw - 32px));
+    padding: 8px 20px 8px 10px;
+    border-radius: 26px;
+    background: var(--color-raised);
+    box-shadow: var(--shadow-float);
+    font-size: 16px;
+    line-height: 1.4;
+    color: var(--color-ink-2);
+  }
+  .toast b {
+    display: block;
+    font-weight: 500;
+    color: var(--color-ink);
+  }
+  .menu {
+    min-width: 240px;
+    padding: 6px;
+    border-radius: var(--radius-menu);
+    background: var(--color-raised);
+    box-shadow: var(--shadow-float);
+    display: flex;
+    flex-direction: column;
+  }
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    padding: 0 14px;
+    border-radius: var(--radius-v);
+    font-size: 16px;
+    color: var(--color-ink);
+    text-align: left;
+    white-space: nowrap;
+    transition: background-color 0.18s ease;
+  }
+  .menu-item:hover,
+  .menu-item:focus-visible {
+    background: var(--color-surface-2);
+  }
+
+  /* ── dialogs ── */
+  /*
+   * The dialog is on screen from its first frame: only the backdrop fades in. Leaving, the whole thing fades.
+   * The backdrop scrolls, and the dialog centres with auto margins, so a tall dialog on a short screen can always be
+   * scrolled to its top and bottom, and it never gets wider than the screen.
+   */
+  .scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: transparent;
+    display: flex;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 16px;
+    transition:
+      background-color 0.18s ease,
+      opacity 0.16s ease;
+  }
+  .scrim[data-open="true"] {
+    background: var(--color-scrim);
+  }
+  .scrim[data-closing="true"] {
+    opacity: 0;
+  }
+  /* Room above for the host puff standing on the dialog's edge. */
+  .scrim:has(> .dialog.has-host) {
+    padding-top: 112px;
+  }
+  .dialog {
+    position: relative;
+    margin: auto;
+    width: 560px;
+    max-width: 100%;
+    min-width: 0;
+    background: var(--color-raised);
+    border-radius: var(--radius-v2);
+    box-shadow: var(--shadow-sheet);
+    padding: 30px 32px 28px;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(12px) scale(0.97);
+    transition: transform 0.32s var(--ease);
+  }
+  .scrim[data-open="true"] .dialog {
+    transform: none;
+  }
+  /* The panel takes focus only to hold it inside; the controls show their own rings. */
+  .dialog:focus {
+    outline: none;
+  }
+  .dialog.has-host {
+    padding-top: 52px;
+  }
+  .dialog-host {
+    position: absolute;
+    left: 50%;
+    top: -96px;
+    transform: translateX(-50%);
+    z-index: 2;
+    pointer-events: none;
+  }
+  .dialog-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 3;
+  }
+  .dialog-head {
+    padding-right: 36px;
+  }
+  /* A mark beside the title (an app's icon): the title and its line stack beside it, centred on it. */
+  .dialog-head.has-mark {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 18px;
+    align-items: center;
+    align-content: center;
+  }
+  .dialog-mark {
+    grid-row: span 2;
+    display: flex;
+  }
+  .dialog-head.has-mark .t-line {
+    grid-column: 2;
+    margin-top: 2px;
+  }
+  /* A title that wraps splits evenly: no word left alone on the second line. */
+  .dialog-head .t-title {
+    text-wrap: balance;
+  }
+  .dialog-head .t-line {
+    margin-top: 6px;
+    font-size: 16px;
+    /* No lone last word on a narrow screen. */
+    text-wrap: pretty;
+  }
+  .dialog-body {
+    margin-top: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .dialog .actions {
+    margin-top: 24px;
+  }
+}
+
+@media (max-width: 560px) {
+  .scrim {
+    padding: 10px;
+  }
+  .scrim:has(> .dialog.has-host) {
+    padding-top: 100px;
+  }
+  .dialog {
+    padding: 24px 18px 20px;
+    border-radius: 22px;
+  }
+  .dialog.has-host {
+    padding-top: 46px;
+  }
+  .dialog-close {
+    top: 12px;
+    right: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill,
+  .text-action,
+  .text-action > svg,
+  .row-chev,
+  .tabs-thumb,
+  .dialog,
+  .scrim {
+    transition: none;
+  }
+  .spin {
+    animation-duration: 2.4s;
+  }
+  .skel {
+    animation: none;
+  }
+}
