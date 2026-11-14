@@ -34,12 +34,14 @@ function RehearsalView() {
   const params = useSearchParams();
   const status = useApi<Status>("/api/v1/status");
   const past = useApi<{ data: Rehearsal[] }>("/api/v1/rehearsals", 10_000);
-  const [mode, setMode] = useState<Mode>("scripted");
+  const mode: Mode = "scripted";
   const [rounds, setRounds] = useState<Rounds>("3");
   const [starting, setStarting] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  const id = params.get("id") ?? past.data?.data[0]?.id ?? null;
+  // The showcased live run first (a NEAR AI model as the agent), else the latest run of any kind.
+  const showcase = past.data?.data.find((x) => x.mode === "live" && x.status === "done");
+  const id = params.get("id") ?? showcase?.id ?? past.data?.data[0]?.id ?? null;
   const [running, setRunning] = useState(true);
   const one = useApi<Rehearsal>(id ? `/api/v1/rehearsals/${encodeURIComponent(id)}` : null, running ? 1_500 : undefined);
   const r = one.data;
@@ -52,15 +54,9 @@ function RehearsalView() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [r?.status]);
 
-  const live = status.data?.near_ai.configured ?? false;
-  const modes: TabOption<Mode>[] = [
-    { value: "scripted", label: "Scripted" },
-    { value: "live", label: "Live" },
-  ];
 
   const start = async () => {
     if (starting) return;
-    if (mode === "live" && !live) return;
     setStarting(true);
     setErr(null);
     try {
@@ -96,25 +92,16 @@ function RehearsalView() {
       <section className="group rh-controls" aria-label="Run a rehearsal">
         <div className="rh-fields">
           <div className="field">
-            <span className="field-label">Who plays the agent</span>
-            <Tabs label="Who plays the agent" value={mode} options={modes} onChange={setMode} />
-          </div>
-          <div className="field">
             <span className="field-label">Rounds</span>
             <Tabs label="Rounds" value={rounds} options={ROUNDS} onChange={setRounds} />
           </div>
         </div>
-        <button type="button" className="pill pill-ink" onClick={start} aria-busy={starting} disabled={(mode === "live" && !live) || running && r?.status === "running"}>
+        <button type="button" className="pill pill-ink" onClick={start} aria-busy={starting} disabled={running && r?.status === "running"}>
           {starting ? <span className="spin" aria-hidden /> : null}
           {r?.status === "running" ? "Running" : starting ? "Starting" : "Run a rehearsal"}
         </button>
         <p className={err ? "field-note is-oops" : "field-note"}>
-          {err ??
-            (mode === "scripted"
-              ? "Scripted: a deterministic agent with eight known flaws. Offline and reproducible; the verdicts are real."
-              : live
-                ? `Live: ${status.data?.near_ai.agent_model ?? "a NEAR AI model"} plays the agent; the judge runs on NEAR AI too. Takes a minute or two.`
-                : "Live needs a NEAR AI key on the server. Scripted runs without one.")}
+          {err ?? "A scripted agent with eight known flaws: free, offline and reproducible, and the verdicts are real. Live runs, where a NEAR AI model plays the agent, spend AI credits, so the operator starts them; the latest one is shown first."}
         </p>
       </section>
 

@@ -166,21 +166,32 @@ export async function refreshExecution(x: Execution): Promise<Execution> {
 export async function nearOverview() {
   const out: {
     configured: boolean;
+    /** The partner key is accepted by the Agent API (GET /v1/whoami answers). */
+    valid: boolean | null;
     grant: boolean;
     network: unknown;
     agent: { id: string; name?: string; status?: string; near_account_id?: string | null } | null;
     balances: { asset_id: string; symbol: string; amount: number; usd: number | null }[] | null;
     budget: unknown;
     error?: string;
-  } = { configured: agentApiConfigured(), grant: await grantConfigured(), network: null, agent: null, balances: null, budget: null };
+  } = { configured: agentApiConfigured(), valid: null, grant: await grantConfigured(), network: null, agent: null, balances: null, budget: null };
   try {
     const r = await fetch(`${BASE}/v1/network`, { signal: AbortSignal.timeout(4000) });
     if (r.ok) out.network = await r.json();
   } catch {
     /* advisory only */
   }
+  if (out.configured) {
+    try {
+      await client().whoami();
+      out.valid = true;
+    } catch (e) {
+      out.valid = false;
+      out.error = errText(e);
+    }
+  }
   const id = await demoAgentId();
-  if (!out.configured || !id) return out;
+  if (!out.configured || !out.valid || !id) return out;
   try {
     const [agent, balances, policy, list] = await Promise.all([client().getAgent(id), client().getBalances(id), client().getPolicy(id), tokens()]);
     const a = agent as unknown as { id: string; name?: string; status?: string; wallet?: { near_account_id?: string | null } };

@@ -212,6 +212,21 @@ function compose(verdict: Verdict, findings: Finding[], resolved: Resolved, expo
 const isAction = (x: unknown): x is ProposedAction => !!x && typeof x === "object" && ACTIONS.includes((x as ProposedAction).type) && typeof (x as ProposedAction).params === "object";
 const isRefuse = (x: unknown): x is { type: "refuse"; message: string } => !!x && typeof x === "object" && (x as { type: string }).type === "refuse" && typeof (x as { message: unknown }).message === "string";
 
+/**
+ * A daily budget of NEAR AI judge calls for the public endpoints (check, MCP), so open access can't drain the credits.
+ * Past it, verdicts come from the deterministic rules and say so. Rehearsals the operator starts are not counted.
+ */
+const DAILY_MODEL_CALLS = Number(process.env.NEAR_AI_DAILY_LIMIT) || 400;
+const budget = { day: "", used: 0 };
+function spendModelCall(exempt: boolean): boolean {
+  const today = new Date().toISOString().slice(0, 10);
+  if (budget.day !== today) { budget.day = today; budget.used = 0; }
+  if (exempt) return true;
+  if (budget.used >= DAILY_MODEL_CALLS) return false;
+  budget.used++;
+  return true;
+}
+
 export interface JudgeOptions {
   store?: Store;
   /** Run the action on NEAR Intents after an ALLOW (needs the grant). */
@@ -251,7 +266,9 @@ export async function judgeProposal(p: Proposal, opts: JudgeOptions = {}): Promi
     suggested = { type: "refuse", message: `Don't send this: its ${p.action.type === "transfer" || p.action.type === "withdraw" ? "recipient or amount" : "values"} came from instructions in ${inj.spans[0]?.source ?? "untrusted content"}. Ask the user to confirm the payee and the amount before paying.` };
   }
   let summary = "";
-  const useModel = opts.model ?? (nearAiConfigured() && process.env.CHANCENEAR_RULES_ONLY !== "1");
+  const wantModel = opts.model ?? (nearAiConfigured() && process.env.CHANCENEAR_RULES_ONLY !== "1");
+  const useModel = wantModel && spendModelCall(opts.model === true || Boolean(opts.rehearsal));
+  if (wantModel && !useModel) judge = { ...judge, reasoning: "Today's NEAR AI budget for public checks is used up, so the deterministic rules decided this one." };
   if (useModel) {
     const m = await askModel(p, resolved, findings, quote, list, opts.proof ?? true);
     if ("error" in m) {
