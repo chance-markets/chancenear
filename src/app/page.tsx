@@ -81,6 +81,8 @@ function Arrow() {
 export default function HowItWorks() {
   const router = useRouter();
   const list = useApi<{ data: Rehearsal[] }>("/api/v1/rehearsals", 15_000);
+  const status = useApi<{ agent_api: { configured: boolean; valid: boolean | null } }>("/api/v1/status");
+  const waiting = status.data?.agent_api.configured && status.data.agent_api.valid === false;
   const [starting, setStarting] = useState(false);
   const [startErr, setStartErr] = useState<string | null>(null);
   const done = (list.data?.data ?? []).filter((r) => r.status === "done" && r.rounds.length);
@@ -283,6 +285,9 @@ export default function HowItWorks() {
               <li>An allowed action runs under the owner&apos;s grant with <code>reference: sha256:&lt;verdict&gt;</code>, so NEAR&apos;s attested receipt names the verdict that approved it.</li>
               <li>The owner creates the agent with a passkey on the Connect page: two signatures, then ChanceNear acts only inside those rules.</li>
             </ul>
+            {waiting ? (
+              <p className="say is-small near-wait">Waiting on Agent API access: it doesn&apos;t accept our partner key yet, so swaps are priced through 1Click until it does.</p>
+            ) : null}
           </div>
           <div className="group group-pad">
             <b className="t-name">NEAR AI Cloud</b>

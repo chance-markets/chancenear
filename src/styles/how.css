@@ -429,6 +429,10 @@
 .near .t-name {
   font-weight: 500;
 }
+.near-wait {
+  margin-top: 6px;
+  color: var(--color-amber-v);
+}
 .how-go-title {
   padding: 0 4px;
 }

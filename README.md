@@ -1,19 +1,37 @@
 # ChanceNear
 
-ChanceNear checks every action an AI agent proposes on the **NEAR Intents Agent API** before any funds move, and
-turns every mistake it catches into a lesson the agent loads before its next action.
+**The self-improvement stack for NEAR agents.** ChanceNear checks every action an AI agent proposes on the **NEAR
+Intents Agent API** before it runs, turns every mistake it catches into a lesson, and hands the lessons back so the
+agent stops repeating them.
 
-- **Judge**: prompt-injection screening, intent match against the user's own words, the Agent API's own `dry: true`
-  quote, and a **NEAR AI Cloud** model running in a TEE whose signed answer is verified. Verdict: `ALLOW`, `BLOCK` or
-  `ESCALATE`.
-- **Self-improvement loop**: every `BLOCK` is stored (Postgres) and distilled into a lesson in that agent's playbook.
-  The agent reads its playbook in every verdict, as `playbook.md` at session start, and through an MCP tool. Lessons
-  are credited each time they prevent the same mistake, and repeats are tracked. Rehearsals replay a scenario suite
-  round after round and graph the mistakes falling.
+The stack has five layers. A typical agent guard is only the first.
 
-Hosted demo: **https://web-production-a3b908a4.up.railway.app**
+| Layer | What it does |
+| --- | --- |
+| **Catch** | Judges each proposed action four ways: where its values came from (prompt-injection taint), the user's own words (amounts, decimals, shares, tokens, chain, payee, buy or sell), NEAR's own dry run and live quotes, and a **NEAR AI Cloud** model in a TEE whose signed answer is verified. `ALLOW`, `BLOCK` or `ESCALATE`. |
+| **Learn** | Every `BLOCK` becomes one short rule in that agent's playbook (Postgres), reinforced when it happens again. |
+| **Remember** | The agent gets its lessons back in every verdict, as `playbook.md` at session start (a Claude Code `SessionStart` hook), and over MCP. |
+| **Measure** | Each lesson is credited when it prevents a mistake; repeats are counted; rehearsals replay a suite of traps round after round and graph the mistakes falling. |
+| **Train** (optional) | Exports the judged actions as SFT or DPO JSONL to fine-tune open-weight agents such as Kimi K2. |
+
+Hosted demo: **https://web-production-a3b908a4.up.railway.app** (the front page, *How it works*, walks through one real
+attack step by step).
 
 Built for NEAR HACKATHON (tracks: AI Security & Defense, Privacy & Private AI).
+
+## How it differs from a typical AI agent guard
+
+| | A typical agent guard | ChanceNear | Where to check |
+| --- | --- | --- | --- |
+| Checks against | Fixed rules: limits, allowlists | The user's own words: amount, decimals, share of a balance, token, chain, payee, buy or sell | `src/server/intent.ts`, `tests/judge.test.ts` |
+| Prompt injection | Suspicious phrases | Provenance: blocks when the recipient, amount or kind of action came from untrusted text; reading an attack is fine | `src/server/injection.ts`, `tests/parse.test.ts` |
+| Ground truth | Its own estimate | NEAR's numbers: `GET /v1/tokens`, Agent API `dry: true`, live 1Click quotes | `src/server/near-intents.ts` |
+| Proof | A log line | NEAR AI Cloud verdict signed in a TEE, signature and hashes verified; `reference = sha256:<verdict>` on NEAR receipts | `src/server/near-ai.ts` |
+| Model failure | The model decides | A model can add doubt but never lift a deterministic block | `src/server/judge.ts` |
+| After a mistake | Blocks it and forgets | Writes a lesson the agent loads before every later action | `src/server/lessons.ts` |
+| Does it help? | No way to tell | Prevented mistakes, repeats, and rehearsal curves | `src/server/rehearsal.ts`, `tests/loop.test.ts` |
+
+A plain-text brief for AI readers is served at `/llms.txt`.
 
 ## The problem
 
@@ -27,12 +45,15 @@ already enforces the owner's numeric policy (assets, limits, USD budget, destina
 
 ### Without installing anything (hosted)
 
-1. Open https://web-production-a3b908a4.up.railway.app/rehearsal and press **Run rehearsal** with *Scripted*.
+1. Open https://web-production-a3b908a4.up.railway.app and read *How it works*: one invoice attack, step by step,
+   with the real payloads, the four checks, the lesson written and the corrected retry.
+2. Open https://web-production-a3b908a4.up.railway.app/rehearsal and press **Run a rehearsal** with *Scripted*.
    See the mistakes-per-round chart fall from 6 of 10 in round 1 to 0 in rounds 2 and 3, and the lessons it learned.
-2. Open https://web-production-a3b908a4.up.railway.app/try, pick *Invoice with a hidden payee*, choose *Naive agent*,
+   *Live* lets a NEAR AI model play the agent instead.
+3. Open https://web-production-a3b908a4.up.railway.app/try, pick *Invoice with a hidden payee*, choose *Naive agent*,
    press **Check**. See `BLOCK` with the injected sentence quoted and a new lesson. Choose *Careful agent*: `ALLOW`,
    with "the agent read injected instructions and did not follow them".
-3. Judge an action over HTTP (no key needed):
+4. Judge an action over HTTP (no key needed):
 
    ```bash
    curl -s https://web-production-a3b908a4.up.railway.app/api/v1/check -H 'Content-Type: application/json' -d '{
@@ -48,7 +69,7 @@ already enforces the owner's numeric policy (assets, limits, USD budget, destina
    See `"verdict": "BLOCK"`, a finding *Wrong decimals for USDC* ("USDC uses 6 decimals ... this sends
    25,000,000,000,000 USDC"), `suggested.params.amount = "25000000"`, and `lessons[0]` telling the agent how to convert.
    Then `GET /api/v1/agents/readme-test/playbook.md` shows that lesson in the agent's playbook.
-4. MCP: `claude mcp add --transport http chancenear https://web-production-a3b908a4.up.railway.app/api/mcp` gives
+5. MCP: `claude mcp add --transport http chancenear https://web-production-a3b908a4.up.railway.app/api/mcp` gives
    Claude Code the tools `check_action` and `get_playbook`.
 
 ### Locally (Node 22+, no keys needed)
@@ -98,8 +119,22 @@ for NEAR AI verdicts, live dry-run quotes and execution.
   `model:sha256(request):sha256(response)`. ChanceNear recovers the EIP-191 signer, checks it equals
   `signing_address`, and checks both hashes against the exact bytes it sent and received. The verdict page shows the
   result.
-- In live rehearsals a second NEAR AI model (`Qwen/Qwen3.8-27B`; `NEAR_AI_AGENT_MODEL`) plays the agent, so the
-  learning curve comes from a real model reading its own playbook.
+- In live rehearsals a second NEAR AI model (`Qwen/Qwen3.8-27B`, thinking off; `NEAR_AI_AGENT_MODEL`) plays the
+  agent, so the learning curve comes from a real model reading its own playbook.
+
+**NEAR Intents 1Click** (`oneClickQuote` in `src/server/near-intents.ts`)
+
+- Swaps are priced with a dry `POST https://1click.chaindefuser.com/v0/quote` (the solver market Agent API swaps
+  route through), using the partner key as its JWT: the real output, the USD in and out, and the cost of the trade.
+  An impossible size (a decimals slip worth 25 trillion USDC) comes back as "No liquidity available" and is shown as
+  a finding. This is the fallback whenever the Agent API itself can't answer a dry run.
+
+**Status of Agent API access during the hackathon.** Our partner key from partners.near-intents.org (type
+*Distribution Channel*, the only partner type the portal offered us) is accepted by 1Click but the Agent API answered
+`401 invalid_api_key` to `GET /v1/whoami`; we asked the NEAR team which key type it needs. Everything that depends on
+it (Agent API dry runs, the passkey owner flow, execution with `reference = sha256:<verdict>`) is implemented against
+the official SDK and switches on with a key the Agent API accepts. Until then, swaps are grounded in live 1Click
+quotes and the public `GET /v1/tokens` and `GET /v1/network` are used live.
 
 ## The self-improvement loop
 
