@@ -4,6 +4,8 @@
 Intents Agent API** before it runs, turns every mistake it catches into a lesson, and hands the lessons back so the
 agent stops repeating them.
 
+![ChanceNear: the self-improvement stack for NEAR agents](docs/images/01-stack.png)
+
 The stack has five layers. A typical agent guard is only the first.
 
 | Layer | What it does |
@@ -32,6 +34,8 @@ Built for NEAR HACKATHON (tracks: AI Security & Defense, Privacy & Private AI).
 | Does it help? | No way to tell | Prevented mistakes, repeats, and rehearsal curves | `src/server/rehearsal.ts`, `tests/loop.test.ts` |
 
 A plain-text brief for AI readers is served at `/llms.txt`.
+
+![An injected payment, checked four ways and blocked](docs/images/02-attack.png)
 
 ## The problem
 
@@ -114,6 +118,8 @@ for NEAR AI verdicts, live dry-run quotes and execution.
 
 **NEAR AI Cloud** (`src/server/near-ai.ts`)
 
+![A NEAR AI verdict with its TEE signature and hashes verified](docs/images/09-verdict-judge.png)
+
 - The judge is a chat completion on `https://cloud-api.near.ai/v1` with a TEE-hosted model
   (`deepseek-ai/DeepSeek-V4.1-Flash-1017` by default; `NEAR_AI_MODEL`).
 - After each verdict, `GET /v1/signature/{chat_id}` returns the TEE's signature over
@@ -138,6 +144,10 @@ the official SDK and switches on with a key the Agent API accepts. Until then, s
 quotes and the public `GET /v1/tokens` and `GET /v1/network` are used live.
 
 ## The self-improvement loop
+
+![The mistake becomes a lesson; the retry is allowed and credited](docs/images/03-lesson.png)
+
+![The sample rehearsal: a NEAR AI model plays the agent, round after round](docs/images/07-rehearsal.png)
 
 1. **Catch**: a `BLOCK` names the kind of mistake: injected instructions, token decimals, a share of the balance, the
    user's chain, a lookalike recipient, a buy/sell side, the kind of action, the owner's rules.

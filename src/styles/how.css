@@ -451,6 +451,10 @@
   font-size: 13px;
   color: var(--color-ink);
 }
+/* An account name never splits at its hyphen. */
+.nowrap {
+  white-space: nowrap;
+}
 .near-wait {
   margin-top: 6px;
   color: var(--color-amber-v);
