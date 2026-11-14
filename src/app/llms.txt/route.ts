@@ -6,7 +6,7 @@ import { origin } from "@/server/http";
  */
 export function GET(req: Request) {
   const base = origin(req);
-  const repo = "https://github.com/chance-markets/chance-lite";
+  const repo = "https://github.com/chance-markets/chancenear";
   const body = `# ChanceNear
 
 > The self-improvement stack for AI agents on NEAR Intents. ChanceNear checks every action an agent proposes on the

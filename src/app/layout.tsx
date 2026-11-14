@@ -35,7 +35,7 @@ const STRUCTURED = {
   operatingSystem: "Web",
   isAccessibleForFree: true,
   license: "https://opensource.org/licenses/MIT",
-  sameAs: ["https://github.com/chance-markets/chance-lite"],
+  sameAs: ["https://github.com/chance-markets/chancenear"],
   featureList: [
     "Pre-execution judgment of NEAR Intents Agent API swaps, transfers, withdrawals and limit orders",
     "Intent match against the user's own words: amounts, token decimals, shares of a balance, tokens, chain, payee, buy or sell",
