@@ -121,6 +121,32 @@ export function resolve(p: Proposal, list: AssetRef[]): { facts: ActionFacts; re
   return { facts, resolved };
 }
 
+/** The fields each Agent API action needs (from its OpenAPI document). */
+const REQUIRED: Record<ActionType, string[]> = {
+  swap: ["origin_asset", "destination_asset", "amount"],
+  transfer: ["asset", "amount", "recipient"],
+  withdraw: ["asset", "amount", "chain", "recipient"],
+  limit_order: ["base_asset", "quote_asset", "side", "quantity", "price"],
+};
+
+/** A body the Agent API would refuse outright: missing fields, or an amount that isn't an atomic integer string. */
+function schemaFindings(a: ProposedAction): Finding[] {
+  const params = a.params as Record<string, unknown>;
+  const need = REQUIRED[a.type];
+  const missing = need.filter((k) => params[k] == null || params[k] === "");
+  const out: Finding[] = [];
+  if (missing.length) {
+    out.push({ check: "intent", category: "intent_mismatch", severity: "high", title: "Not a valid Agent API body", detail: `A ${a.type.replace("_", " ")} needs ${need.join(", ")}; this one is missing ${missing.join(", ")}.` });
+  }
+  for (const k of ["amount", "quantity"]) {
+    const v = params[k];
+    if (v != null && !(typeof v === "string" && /^[0-9]+$/.test(v))) {
+      out.push({ check: "intent", category: "amount_error", severity: "high", title: "Amount is not in atomic units", detail: `${k} must be an integer string in the token's smallest unit; this sends ${JSON.stringify(v)}.` });
+    }
+  }
+  return out;
+}
+
 const POLICY_WARNINGS = /^(policy_|spend_budget_exceeded|spend_price_unavailable|wallet_frozen|agent_archived|agent_deleted|unsupported_token|invalid_address)/;
 
 function quoteFindings(q: QuoteFacts | undefined): Finding[] {
@@ -255,7 +281,8 @@ export async function judgeProposal(p: Proposal, opts: JudgeOptions = {}): Promi
   const inj = scanInjection(p, facts.spend?.amount);
   const intent = checkIntent(p, facts, list);
   const quote = opts.dryRun === false ? estimate(facts.spend ? { asset: facts.spend.asset, amount: facts.spend.amount } : undefined) : await dryQuote(p.action, facts.spend ? { asset: facts.spend.asset, amount: facts.spend.amount } : undefined);
-  const findings: Finding[] = [...inj.findings, ...intent.findings, ...quoteFindings(quote)];
+  const schema = schemaFindings(p.action);
+  const findings: Finding[] = [...schema, ...inj.findings, ...intent.findings, ...quoteFindings(quote)];
   let verdict = rulesVerdict(findings);
 
   let judge: JudgeTrace = { engine: "rules", latency_ms: 0, intent_match: intent.match, injection_risk: inj.risk };
@@ -316,7 +343,7 @@ export async function judgeProposal(p: Proposal, opts: JudgeOptions = {}): Promi
   // The loop: a BLOCK teaches, a correct action credits what the agent carried.
   let repeat = false;
   if (verdict === "BLOCK") {
-    const key = lessonKeyFor(judgment, intent.lessonKey);
+    const key = lessonKeyFor(judgment, schema.some((f) => f.title === "Not a valid Agent API body") ? "schema" : schema.length ? "decimals" : intent.lessonKey);
     if (key) {
       const t = await teach(db, judgment, key);
       judgment.lesson_id = t.lesson.id;

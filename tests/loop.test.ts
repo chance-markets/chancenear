@@ -66,6 +66,17 @@ test("a correction is never a patched copy of an injected action", async () => {
   assert.equal(r2.judgment.suggested?.type, "swap", "a correction rebuilt from the user's own words is kept");
 });
 
+test("a malformed Agent API body is blocked and teaches the schema", async () => {
+  const db = memoryStore();
+  const s = SCENARIOS.find((x) => x.id === "side-inversion")!;
+  const r = await judgeProposal({ agent: "d", intent: s.intent, context: s.context, balances: s.balances, action: { type: "limit_order", params: { side: "buy", asset: "nep141:wrap.near", amount: "10", price: "2.8" } } }, { store: db, model: false, dryRun: false });
+  assert.equal(r.judgment.verdict, "BLOCK");
+  assert.ok(r.judgment.findings.some((f) => f.title === "Not a valid Agent API body"));
+  const lessons = await db.listLessons("d");
+  assert.equal(lessons[0].key, "schema");
+  assert.match(lessons[0].rule, /base_asset, quote_asset, side, quantity, price/);
+});
+
 test("playbook.md lists the rules an agent must follow", async () => {
   const db = memoryStore();
   await startRehearsal({ mode: "scripted", rounds: 1, store: db, wait: true });

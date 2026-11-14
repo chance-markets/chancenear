@@ -89,6 +89,12 @@ export const TEMPLATES: Record<string, Template> = {
     rule: "Use the limit price the user named, in the quote token per one base token.",
     why: (j) => first(j, "amount_error")?.detail ?? "The limit price differed from the request.",
   },
+  schema: {
+    title: "The Agent API body",
+    category: "intent_mismatch",
+    rule: "Send the exact Agent API body, amounts as atomic integer strings: swap {origin_asset, destination_asset, amount}; transfer {asset, amount, recipient}; withdraw {asset, amount, chain, recipient}; limit_order {base_asset, quote_asset, side, quantity, price}.",
+    why: (j) => first(j, "intent_mismatch")?.detail ?? "The body was missing fields the Agent API requires.",
+  },
   policy: {
     title: "The owner's rules",
     category: "policy_violation",
