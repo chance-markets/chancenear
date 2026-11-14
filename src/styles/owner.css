@@ -5,12 +5,19 @@
   flex-direction: column;
   gap: 18px;
 }
+/* Text lines sit 4px in, like the section's heading and lead; sunk cards stay flush with the other cards. */
+.owner-note,
+.owner-steps,
+.owner-done,
+.owner > .say {
+  padding-left: 4px;
+}
 .owner-steps {
   display: flex;
   flex-direction: column;
   gap: 10px;
   margin: 0;
-  padding: 0;
+  padding: 0 0 0 4px;
   list-style: none;
   counter-reset: owner;
 }

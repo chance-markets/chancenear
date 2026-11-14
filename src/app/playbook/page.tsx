@@ -93,7 +93,7 @@ function PlaybookView() {
             <div className="group">
               {lessons.map((l) => (
                 <article key={l.id} id={l.id} className={l.active ? "lesson" : "lesson is-retired"}>
-                  <span className="t-small">{CATEGORY_NAMES[l.category] ?? l.category}{l.active ? "" : ", retired"}</span>
+                  <span className="t-small">{l.title ?? CATEGORY_NAMES[l.category] ?? l.category}{l.active ? "" : ", retired"}</span>
                   <p className="lesson-rule">{l.rule}</p>
                   <p className="lesson-why">{l.why}</p>
                   {l.example ? (

@@ -94,8 +94,8 @@ export function OwnerSetup() {
 
   const fund = () => run("Asking for an address", async () => setDeposit(await post<Deposit>({ step: "deposit" })));
 
-  if (!state) return <p className="t-small">Reading the agent&apos;s state</p>;
-  if (!state.configured) return <p className="t-line">The server has no Agent API partner key yet, so there is nothing to create the agent with.</p>;
+  if (!state) return <p className="t-small owner-note">Reading the agent&apos;s state</p>;
+  if (!state.configured) return <p className="say owner-note">The server has no Agent API partner key yet, so there is nothing to create the agent with.</p>;
 
   const step = !state.agent_id ? (owner ? "create" : "passkey") : !state.granted ? "grant" : "done";
 

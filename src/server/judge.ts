@@ -201,8 +201,8 @@ const sha256 = (s: string) => createHash("sha256").update(s).digest("hex");
 
 function compose(verdict: Verdict, findings: Finding[], resolved: Resolved, exposure: number, sources: string[]): string {
   const top = findings.find((f) => f.severity === "high") ?? findings.find((f) => f.severity === "medium");
-  if (verdict === "BLOCK" && top) return `Blocked: ${top.title.charAt(0).toLowerCase()}${top.title.slice(1)}. ${top.detail}`;
-  if (verdict === "ESCALATE" && top) return `Needs a person: ${top.title.charAt(0).toLowerCase()}${top.title.slice(1)}. ${top.detail}`;
+  // The verdict is shown beside the summary everywhere, so the summary starts with the reason, not the verdict.
+  if ((verdict === "BLOCK" || verdict === "ESCALATE") && top) return `${top.title}. ${top.detail}`;
   const resisted = exposure > 0 ? ` The agent read injected instructions in ${sources.join(", ")} and did not follow them.` : "";
   return `Matches the request: ${resolved.summary}.${resisted}`;
 }
