@@ -10,12 +10,15 @@
 }
 
 /* ── opening ── */
+/* The opening owns the first screen: the island's height less its top padding, content centred in it. */
 .how-open {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   text-align: center;
   gap: 18px;
+  min-height: calc(100dvh - var(--inset) * 2 - 48px - 32px);
 }
 .how-title {
   max-width: 820px;
@@ -464,6 +467,9 @@
   .how {
     gap: 48px;
     padding-top: 28px;
+  }
+  .how-open {
+    min-height: 0;
   }
   .how-title {
     font-size: 31px;

@@ -214,7 +214,7 @@ async function askModel(p: Proposal, resolved: Resolved, findings: Finding[], qu
       latency_ms: r.latencyMs,
       intent_match: clamp01(a.intent_match),
       injection_risk: clamp01(a.injection_risk),
-      reasoning: typeof a.summary === "string" ? a.summary : undefined,
+      reasoning: typeof a.summary === "string" ? tidy(a.summary) : undefined,
     };
     if (proof) trace.tee = await teeProof(r);
     else trace.tee = { chat_id: r.chatId, model: r.model };
@@ -223,6 +223,9 @@ async function askModel(p: Proposal, resolved: Resolved, findings: Finding[], qu
     return { error: e instanceof Error ? e.message : String(e) };
   }
 }
+
+/** Model text in the house style: no em or en dashes as punctuation. */
+const tidy = (t: string) => t.replace(/\s*[\u2014\u2013]\s*/g, ", ").replace(/,\s*,/g, ",").trim();
 
 const clamp01 = (n: unknown) => (typeof n === "number" && Number.isFinite(n) ? Math.min(1, Math.max(0, n)) : 0.5);
 const sha256 = (s: string) => createHash("sha256").update(s).digest("hex");
@@ -305,7 +308,7 @@ export async function judgeProposal(p: Proposal, opts: JudgeOptions = {}): Promi
       for (const f of m.answer.findings ?? []) {
         if (!CATEGORIES.includes(f.category) || !["low", "medium", "high"].includes(f.severity)) continue;
         if (findings.some((x) => x.title.toLowerCase() === String(f.title).toLowerCase())) continue;
-        findings.push({ check: "judge", category: f.category, severity: f.severity, title: String(f.title).slice(0, 120), detail: String(f.detail ?? "").slice(0, 400) });
+        findings.push({ check: "judge", category: f.category, severity: f.severity, title: tidy(String(f.title)).slice(0, 120), detail: tidy(String(f.detail ?? "")).slice(0, 400) });
       }
       const ruled = verdict;
       const model = m.answer.verdict;
@@ -313,7 +316,7 @@ export async function judgeProposal(p: Proposal, opts: JudgeOptions = {}): Promi
       if (ruled === "BLOCK") verdict = "BLOCK";
       else if (ruled === "ESCALATE") verdict = model === "BLOCK" ? "BLOCK" : model === "ALLOW" && judge.intent_match >= 0.9 ? "ALLOW" : "ESCALATE";
       else verdict = model;
-      if (verdict === model && typeof m.answer.summary === "string" && m.answer.summary.trim()) summary = m.answer.summary.trim();
+      if (verdict === model && typeof m.answer.summary === "string" && m.answer.summary.trim()) summary = tidy(m.answer.summary);
       if (!suggested && (isAction(m.answer.suggested_action) || isRefuse(m.answer.suggested_action))) suggested = m.answer.suggested_action;
     }
   }
