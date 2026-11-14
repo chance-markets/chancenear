@@ -1,21 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { IconCheck, IconClose, IconUpRight } from "@/components/kit/house-icons";
 import { Puff } from "@/components/kit/Puff";
 import { Skeleton } from "@/components/kit/Skeleton";
-import { Tabs, type TabOption } from "@/components/kit/Tabs";
 import { Columns } from "@/components/ui/Columns";
-import { api, useApi } from "@/lib/client";
+import { useApi } from "@/lib/client";
 import { ago, plural } from "@/lib/format";
 import { SCENARIOS } from "@/lib/scenarios";
 import type { Rehearsal, RoundResult } from "@/lib/types";
 
-type Mode = "scripted" | "live";
-type Rounds = "2" | "3" | "4" | "5";
-const ROUNDS: TabOption<Rounds>[] = (["2", "3", "4", "5"] as const).map((r) => ({ value: r, label: r }));
 
 interface Status { near_ai: { configured: boolean; model?: string; agent_model?: string } }
 
@@ -30,14 +26,9 @@ export default function RehearsalPage() {
 const scenarioTitle = (id: string) => SCENARIOS.find((s) => s.id === id)?.title ?? id;
 
 function RehearsalView() {
-  const router = useRouter();
   const params = useSearchParams();
   const status = useApi<Status>("/api/v1/status");
   const past = useApi<{ data: Rehearsal[] }>("/api/v1/rehearsals", 10_000);
-  const mode: Mode = "scripted";
-  const [rounds, setRounds] = useState<Rounds>("3");
-  const [starting, setStarting] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
 
   // The showcased live run first (a NEAR AI model as the agent), else the latest run of any kind.
   const showcase = past.data?.data.find((x) => x.mode === "live" && x.status === "done");
@@ -55,21 +46,6 @@ function RehearsalView() {
   }, [r?.status]);
 
 
-  const start = async () => {
-    if (starting) return;
-    setStarting(true);
-    setErr(null);
-    try {
-      const res = await api<{ rehearsal: Rehearsal }>("/api/v1/rehearsals", { body: { mode, rounds: Number(rounds) } });
-      setRunning(true);
-      router.push(`/rehearsal?id=${encodeURIComponent(res.rehearsal.id)}`);
-      past.reload();
-    } catch (e) {
-      setErr(e instanceof Error ? e.message : "Couldn't start it.");
-    } finally {
-      setStarting(false);
-    }
-  };
 
   const done: RoundResult[] = r?.rounds ?? [];
   const scenarioIds = useMemo(() => {
@@ -89,21 +65,11 @@ function RehearsalView() {
         </div>
       </header>
 
-      <section className="group rh-controls" aria-label="Run a rehearsal">
-        <div className="rh-fields">
-          <div className="field">
-            <span className="field-label">Rounds</span>
-            <Tabs label="Rounds" value={rounds} options={ROUNDS} onChange={setRounds} />
-          </div>
-        </div>
-        <button type="button" className="pill pill-ink" onClick={start} aria-busy={starting} disabled={running && r?.status === "running"}>
-          {starting ? <span className="spin" aria-hidden /> : null}
-          {r?.status === "running" ? "Running" : starting ? "Starting" : "Run a rehearsal"}
-        </button>
-        <p className={err ? "field-note is-oops" : "field-note"}>
-          {err ?? "A scripted agent with eight known flaws: free, offline and reproducible, and the verdicts are real. Live runs, where a NEAR AI model plays the agent, spend AI credits, so the operator starts them; the latest one is shown first."}
-        </p>
-      </section>
+      <p className="t-small rh-note">
+        This is the sample run{r?.mode === "live" ? `: ${r.agent_model ?? "a NEAR AI model"} played the agent and NEAR AI judged, on a fresh playbook` : ""}. New rehearsals are run by the operator only, so
+        visitors can&apos;t drain the AI credits. To run your own, clone the repo and run <code>npm run demo</code> (free, offline) or{" "}
+        <code>npm run demo -- --live</code> with your own NEAR AI key.
+      </p>
 
       {!id && !past.loading ? (
         <div className="lite-whole">
@@ -195,29 +161,6 @@ function RehearsalView() {
         </>
       ) : null}
 
-      {past.data?.data.length ? (
-        <section className="lite-section" aria-labelledby="past">
-          <h2 id="past" className="t-name">Earlier rehearsals</h2>
-          <div className="group">
-            {past.data.data.slice(0, 8).map((p) => {
-              const f = p.rounds[0];
-              const l = p.rounds[p.rounds.length - 1];
-              return (
-                <Link key={p.id} href={`/rehearsal?id=${encodeURIComponent(p.id)}`} className="row" aria-current={p.id === id ? "true" : undefined} onClick={() => setRunning(true)}>
-                  <span className="row-mark"><Puff who="scout" size={32} /></span>
-                  <span className="row-text">
-                    <span className="row-name">{p.mode === "live" ? `Live, ${p.agent_model ?? "NEAR AI"}` : "Scripted agent"}</span>
-                    <span className="row-sub">{ago(p.started_at)} · {p.status === "running" ? "running" : p.status === "failed" ? "stopped" : plural(p.rounds.length, "round")}</span>
-                  </span>
-                  <span className="row-end">
-                    <span className="row-value">{f && l ? `${f.mistakes} to ${l.mistakes}` : ""}</span>
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-      ) : null}
     </div>
   );
 }

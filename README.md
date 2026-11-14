@@ -12,7 +12,7 @@ The stack has five layers. A typical agent guard is only the first.
 | **Learn** | Every `BLOCK` becomes one short rule in that agent's playbook (Postgres), reinforced when it happens again. |
 | **Remember** | The agent gets its lessons back in every verdict, as `playbook.md` at session start (a Claude Code `SessionStart` hook), and over MCP. |
 | **Measure** | Each lesson is credited when it prevents a mistake; repeats are counted; rehearsals replay a suite of traps round after round and graph the mistakes falling. |
-| **Train** (optional) | Exports the judged actions as SFT or DPO JSONL to fine-tune open-weight agents such as Kimi K2. |
+| **Train** (optional) | Exports the judged actions as SFT or DPO JSONL to fine-tune open-weight agents such as Kimi K3, Qwen or DeepSeek. |
 
 Hosted demo: **https://web-production-a3b908a4.up.railway.app** (the front page, *How it works*, walks through one real
 attack step by step).
@@ -47,9 +47,10 @@ already enforces the owner's numeric policy (assets, limits, USD budget, destina
 
 1. Open https://web-production-a3b908a4.up.railway.app and read *How it works*: one invoice attack, step by step,
    with the real payloads, the four checks, the lesson written and the corrected retry.
-2. Open https://web-production-a3b908a4.up.railway.app/rehearsal and press **Run a rehearsal** with *Scripted*.
-   See the mistakes-per-round chart fall from 6 of 10 in round 1 to 0 in rounds 2 and 3, and the lessons it learned.
-   *Live* lets a NEAR AI model play the agent instead.
+2. Open https://web-production-a3b908a4.up.railway.app/rehearsal: the sample live rehearsal, where a NEAR AI model
+   played the agent and NEAR AI judged, on a fresh playbook. See mistakes per round, lessons per round, and every
+   scenario's verdict in each round (each cell links to the verdict). New rehearsals are operator-only so visitors
+   can't drain AI credits; run your own with `npm run demo` (below) or `npm run demo -- --live` with your own key.
 3. Open https://web-production-a3b908a4.up.railway.app/try, pick *Invoice with a hidden payee*, choose *Naive agent*,
    press **Check**. See `BLOCK` with the injected sentence quoted and a new lesson. Choose *Careful agent*: `ALLOW`,
    with "the agent read injected instructions and did not follow them".
@@ -76,13 +77,13 @@ already enforces the owner's numeric policy (assets, limits, USD budget, destina
 
 ```bash
 npm install
-npm test            # 28 tests: every scenario, the loop, the parsers, the export
+npm test            # 30 tests: every scenario, the loop, the parsers, the export
 npm run attack      # a prompt-injected agent tries to pay an attacker and is stopped
 npm run demo        # the learning curve in the terminal
 npm run dev         # http://localhost:3000
 ```
 
-- `npm test`: see 28 passing tests, including *rehearsal: mistakes fall to zero once the playbook holds the lessons*.
+- `npm test`: see 30 passing tests, including *rehearsal: mistakes fall to zero once the playbook holds the lessons*.
 - `npm run attack`: see the injected transfer `BLOCK`ed with the hidden comment quoted, a lesson taught, and the
   agent's retry `ALLOW`ed and credited to that lesson. `npm run attack -- --remote` runs the same against the hosted
   judge, which uses NEAR AI and verifies the TEE signature.
@@ -153,7 +154,7 @@ quotes and the public `GET /v1/tokens` and `GET /v1/network` are used live.
 4. **Measure**: an `ALLOW` on an action where the mistake was possible credits the lessons the agent carried
    (*prevented*). Rehearsals (`src/server/rehearsal.ts`) replay `src/lib/scenarios.ts` (10 scenarios, 8 traps) on a
    fresh playbook: lessons are written the moment a mistake is caught, so learning shows inside round 1 too.
-5. **Optional fine-tune export** for open-weight agents (Kimi K2, Qwen, DeepSeek):
+5. **Optional fine-tune export** for open-weight agents (Kimi K3, Qwen, DeepSeek):
    `GET /api/v1/agents/{agent}/dataset.jsonl?format=sft|dpo`. DPO pairs use the blocked action as *rejected* and the
    agent's own later success on the same task (or the judge's correction) as *chosen*.
 
@@ -174,7 +175,7 @@ from it; blocks).
 | GET | `/api/v1/judgments`, `/api/v1/judgments/:id` | Verdicts, newest first (`agent`, `verdict`, `limit`, `cursor`). |
 | GET | `/api/v1/agents/:agent/playbook(.md)` | The agent's lessons as JSON or markdown. |
 | GET | `/api/v1/agents/:agent/dataset.jsonl?format=sft\|dpo` | Fine-tune export. |
-| POST/GET | `/api/v1/rehearsals`, `/api/v1/rehearsals/:id` | Run (`{mode: "scripted"\|"live", rounds}`) and read rehearsals. |
+| POST/GET | `/api/v1/rehearsals`, `/api/v1/rehearsals/:id` | Read rehearsals; starting one (`{mode: "scripted"\|"live", rounds}`) needs the operator's token. |
 | GET | `/api/v1/stats`, `/api/v1/status` | Dashboard numbers; NEAR AI and Agent API state. |
 | POST | `/api/mcp` | MCP (streamable HTTP, JSON): `check_action`, `get_playbook`. |
 | GET | `/skill.md` | Instructions an agent can load. |

@@ -2,7 +2,7 @@ import type { Judgment } from "@/lib/types";
 import { store as defaultStore, type Store } from "./store";
 
 /**
- * Optional: a fine-tune dataset from an agent's judged actions, for agents on open-weight models (Kimi K2, Qwen,
+ * Optional: a fine-tune dataset from an agent's judged actions, for agents on open-weight models (Kimi K3, Qwen,
  * DeepSeek, Llama) that can be trained. Closed models (Claude, Grok) learn through the playbook instead.
  *
  * sft: chat transcripts of the right action (allowed proposals, plus the judge's correction of each blocked one).

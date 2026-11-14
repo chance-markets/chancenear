@@ -143,7 +143,7 @@ function PlaybookView() {
         <h2 id="export" className="t-name">Fine-tune export, optional</h2>
         <div className="group group-pad">
           <p className="t-body">
-            For agents on open-weight models such as Kimi K2, the same records train the weights. SFT pairs each task with the right action; DPO pairs the
+            For agents on open-weight models such as Kimi K3, Qwen or DeepSeek, the same records train the weights. SFT pairs each task with the right action; DPO pairs the
             blocked action (rejected) with the corrected one (chosen). Closed models like Claude or Grok can&apos;t be fine-tuned this way; they learn through the playbook.
           </p>
           <div className="export-row">

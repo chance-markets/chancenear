@@ -24,11 +24,8 @@ const LOOP = [
 ] as const;
 
 export default function Dashboard() {
-  const router = useRouter();
   const stats = useApi<Stats>("/api/v1/stats", 10_000);
   const recent = useApi<{ data: Judgment[] }>("/api/v1/judgments?limit=6", 10_000);
-  const [starting, setStarting] = useState(false);
-  const [startErr, setStartErr] = useState<string | null>(null);
 
   const s = stats.data;
   const curve = s?.curve ?? [];
@@ -36,18 +33,6 @@ export default function Dashboard() {
   const last = curve[curve.length - 1];
   const learned = last?.lessons ?? s?.lessons.total ?? 0;
 
-  const start = async () => {
-    if (starting) return;
-    setStarting(true);
-    setStartErr(null);
-    try {
-      const r = await api<{ rehearsal: Rehearsal }>("/api/v1/rehearsals", { body: { mode: "scripted", rounds: 3 } });
-      router.push(`/rehearsal?id=${encodeURIComponent(r.rehearsal.id)}`);
-    } catch (e) {
-      setStartErr(e instanceof Error ? e.message : "Couldn't start it.");
-      setStarting(false);
-    }
-  };
 
   const cats = Object.entries(s?.by_category ?? {}).filter(([, n]) => (n ?? 0) > 0).sort((a, b) => (b[1] ?? 0) - (a[1] ?? 0)) as [Category, number][];
   const days = s?.timeline ?? [];
@@ -68,15 +53,11 @@ export default function Dashboard() {
           <span className="lite-hero-sub">
             {first && last
               ? `Over ${plural(curve.length, "rehearsal round")}, with ${plural(learned, "lesson")} in its playbook and ${plural(s?.lessons.prevented ?? 0, "mistake")} prevented.`
-              : "Run a rehearsal to watch an agent stop repeating its mistakes."}
+              : "The sample rehearsal shows an agent stop repeating its mistakes."}
           </span>
-          {startErr ? <span className="field-note is-oops">{startErr}</span> : null}
         </div>
         <div className="lite-hero-actions">
-          <button type="button" className="pill pill-ink" onClick={start} aria-busy={starting}>
-            {starting ? <span className="spin" aria-hidden /> : null}
-            {starting ? "Starting" : "Run a rehearsal"}
-          </button>
+          <Link href="/rehearsal" className="pill pill-ink">See the sample rehearsal</Link>
           <Link href="/playbook" className="text-action">Open the playbook</Link>
         </div>
       </section>

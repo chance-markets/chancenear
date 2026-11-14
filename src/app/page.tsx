@@ -1,15 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { ChanceMark } from "@/components/kit/ChanceMark";
 import { IconNext } from "@/components/kit/house-icons";
 import { Puff, type Who } from "@/components/kit/Puff";
 import { Code } from "@/components/ui/Code";
 import { Columns } from "@/components/ui/Columns";
 import { VerdictWord } from "@/components/ui/Verdict";
-import { api, useApi } from "@/lib/client";
+import { useApi } from "@/lib/client";
 import { plural } from "@/lib/format";
 import { scenarioById } from "@/lib/scenarios";
 import type { Rehearsal } from "@/lib/types";
@@ -66,7 +65,7 @@ const STACK = [
   { who: "guide" as Who, pose: "thinking", name: "Learn", line: "Turns each block into one short rule for that agent, kept in Postgres and reinforced if it happens again.", uses: "Postgres" },
   { who: "trader" as Who, pose: "asking", name: "Remember", line: "Hands the rules back: in every verdict, as playbook.md at the start of a session, and over MCP.", uses: "HTTP, MCP, skill.md" },
   { who: "scout" as Who, pose: "research", name: "Measure", line: "Counts the mistakes each lesson prevents and the ones an agent repeats anyway, and replays a suite of traps round after round.", uses: "Rehearsals" },
-  { who: "scout" as Who, pose: "cheer", name: "Train", line: "Optional: exports the judged actions as SFT or DPO data to fine-tune open-weight agents such as Kimi K2.", uses: "JSONL export", optional: true },
+  { who: "scout" as Who, pose: "cheer", name: "Train", line: "Optional: exports the judged actions as SFT or DPO data to fine-tune open-weight agents such as Kimi K3, Qwen or DeepSeek.", uses: "JSONL export", optional: true },
 ];
 
 /** A drawn arrow, round caps, on the house stroke. */
@@ -79,29 +78,14 @@ function Arrow() {
 }
 
 export default function HowItWorks() {
-  const router = useRouter();
   const list = useApi<{ data: Rehearsal[] }>("/api/v1/rehearsals", 15_000);
   const status = useApi<{ agent_api: { configured: boolean; valid: boolean | null } }>("/api/v1/status");
   const waiting = status.data?.agent_api.configured && status.data.agent_api.valid === false;
-  const [starting, setStarting] = useState(false);
-  const [startErr, setStartErr] = useState<string | null>(null);
   const done = (list.data?.data ?? []).filter((r) => r.status === "done" && r.rounds.length);
   const shown = done.find((r) => r.mode === "live") ?? done[0];
   const first = shown?.rounds[0];
   const last = shown?.rounds[shown.rounds.length - 1];
 
-  const start = async () => {
-    if (starting) return;
-    setStarting(true);
-    setStartErr(null);
-    try {
-      const r = await api<{ rehearsal: Rehearsal }>("/api/v1/rehearsals", { body: { mode: "scripted", rounds: 3 } });
-      router.push(`/rehearsal?id=${encodeURIComponent(r.rehearsal.id)}`);
-    } catch (e) {
-      setStartErr(e instanceof Error ? e.message : "Couldn't start it.");
-      setStarting(false);
-    }
-  };
 
   return (
     <div className="lite how">
@@ -220,7 +204,7 @@ export default function HowItWorks() {
               <li><b>In every verdict.</b> A block comes back with the rule to apply on the next try.</li>
               <li><b>At the start of every session.</b> <code>playbook.md</code>: Claude Code loads it with a SessionStart hook; any bot can put it in its system prompt.</li>
               <li><b>Over MCP.</b> <code>get_playbook</code> and <code>check_action</code>, one line to connect Claude Code.</li>
-              <li><b>As training data, if you want it.</b> Open-weight agents such as Kimi K2 can be fine-tuned on the judged actions (SFT or DPO JSONL).</li>
+              <li><b>As training data, if you want it.</b> Open-weight agents such as Kimi K3, Qwen or DeepSeek can be fine-tuned on the judged actions (SFT or DPO JSONL).</li>
             </ul>
             <Link href="/playbook" className="text-action how-more">See the playbooks<IconNext /></Link>
           </div>
@@ -239,11 +223,7 @@ export default function HowItWorks() {
               </p>
             ) : null}
             <div className="how-curve-go">
-              <button type="button" className="pill pill-ink" onClick={start} aria-busy={starting}>
-                {starting ? <span className="spin" aria-hidden /> : null}
-                {starting ? "Starting" : "Run a rehearsal"}
-              </button>
-              {startErr ? <span className="field-note is-oops">{startErr}</span> : null}
+              <Link href="/rehearsal" className="text-action">Open the sample rehearsal<IconNext /></Link>
             </div>
           </div>
         </div>
@@ -312,7 +292,7 @@ export default function HowItWorks() {
       <section className="how-section" aria-labelledby="go">
         <h2 id="go" className="t-title how-go-title">See it for yourself</h2>
         <div className="group">
-          <Link href="/rehearsal" className="row"><span className="row-mark"><Puff who="scout" size={32} /></span><span className="row-text"><span className="row-name">Watch an agent learn</span><span className="row-sub">A rehearsal: 10 traps, three rounds, the playbook carried over</span></span><IconNext className="row-chev" /></Link>
+          <Link href="/rehearsal" className="row"><span className="row-mark"><Puff who="scout" size={32} /></span><span className="row-text"><span className="row-name">Watch an agent learn</span><span className="row-sub">The sample rehearsal: 10 traps, three rounds, the playbook carried over</span></span><IconNext className="row-chev" /></Link>
           <Link href="/try" className="row"><span className="row-mark"><Puff who="pick-tangerine" size={32} /></span><span className="row-text"><span className="row-name">Check an action yourself</span><span className="row-sub">Pick a case, play a careful or a naive agent, read the verdict</span></span><IconNext className="row-chev" /></Link>
           <Link href="/dashboard" className="row"><span className="row-mark"><Puff who="guide" size={32} /></span><span className="row-text"><span className="row-name">Everything judged so far</span><span className="row-sub">The dashboard: verdicts, lessons, what gets stopped</span></span><IconNext className="row-chev" /></Link>
           <Link href="/connect" className="row"><span className="row-mark"><Puff who="trader" size={32} /></span><span className="row-text"><span className="row-name">Connect your agent</span><span className="row-sub">The HTTP API, MCP for Claude Code, and the NEAR agent itself</span></span><IconNext className="row-chev" /></Link>

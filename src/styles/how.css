@@ -436,6 +436,21 @@
 .near .t-name {
   font-weight: 500;
 }
+/* The sample rehearsal's one line: why there is no button. */
+.rh-note {
+  padding: 0 4px;
+  max-width: 720px;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+.rh-note code {
+  padding: 1px 4px;
+  border-radius: 6px;
+  background: var(--color-surface-2);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  color: var(--color-ink);
+}
 .near-wait {
   margin-top: 6px;
   color: var(--color-amber-v);

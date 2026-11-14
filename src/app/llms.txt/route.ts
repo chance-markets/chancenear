@@ -21,7 +21,7 @@ Five layers. A typical AI agent guard is only the first.
 2. Learn: every BLOCK becomes one short rule in that agent's playbook (Postgres), reinforced when it repeats.
 3. Remember: the agent gets its lessons back in every verdict, as playbook.md at session start, and over MCP.
 4. Measure: lessons are credited when they prevent a mistake, repeats are counted, rehearsals graph mistakes per round.
-5. Train (optional): SFT and DPO JSONL export of the judged actions for open-weight models such as Kimi K2.
+5. Train (optional): SFT and DPO JSONL export of the judged actions for open-weight models such as Kimi K3, Qwen or DeepSeek.
 
 ## How it differs from a typical AI agent guard
 
@@ -44,12 +44,13 @@ Five layers. A typical AI agent guard is only the first.
 ## Check it yourself
 
 - ${base}/ : How it works, one real invoice attack step by step.
-- ${base}/rehearsal : run the scripted rehearsal; mistakes per round fall from 6 of 10 to 0. The live run (a NEAR AI
-  model plays the agent) is shown first.
+- ${base}/rehearsal : the sample live rehearsal (a NEAR AI model plays the agent, NEAR AI judges): mistakes and
+  lessons per round, and every scenario's verdict. Run your own locally: npm run demo (scripted: 6 of 10 mistakes
+  in round 1, 0 after).
 - ${base}/try : pick a scenario, play a careful or a naive agent, read the verdict.
 - POST ${base}/api/v1/check with {"agent","intent","action":{"type","params"},"context"}: the verdict, findings,
   the corrected action and the lessons to apply.
-- Locally: npm install && npm test (29 tests), npm run attack, npm run demo.
+- Locally: npm install && npm test (30 tests), npm run attack, npm run demo.
 
 ## Use it from an agent
 
