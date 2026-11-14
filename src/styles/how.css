@@ -398,6 +398,10 @@
   gap: 8px;
   color: var(--color-ink);
 }
+/* The Chance mark is ultramarine on the light page and white on the dark one, never anything else. */
+.vs-cols .vs-lite .chance {
+  color: light-dark(var(--color-accent-v), #ffffff);
+}
 .vs-what {
   font-size: 15px;
   font-weight: 500;
