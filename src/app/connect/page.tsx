@@ -60,7 +60,7 @@ export default function ConnectPage() {
       <header className="lite-page-head">
         <div>
           <h1 className="t-title">Connect</h1>
-          <p className="t-line">Point an agent at Chance Lite before it calls the NEAR Intents Agent API. It answers ALLOW, BLOCK or ESCALATE, with the lessons to carry forward.</p>
+          <p className="t-line">Point an agent at ChanceNear before it calls the NEAR Intents Agent API. It answers ALLOW, BLOCK or ESCALATE, with the lessons to carry forward.</p>
         </div>
       </header>
 
@@ -151,7 +151,7 @@ export default function ConnectPage() {
 
       <section className="lite-section" aria-labelledby="tools">
         <h2 id="tools" className="t-name">For Claude Code and other MCP clients</h2>
-        <Code label="Terminal">{`claude mcp add --transport http chance-lite ${origin}/api/mcp`}</Code>
+        <Code label="Terminal">{`claude mcp add --transport http chancenear ${origin}/api/mcp`}</Code>
         <div className="export-row">
           <a className="text-action is-out" href="/skill.md">skill.md for agents<IconUpRight /></a>
           <a className="text-action is-out" href="/api/v1/agents/demo-trader/playbook.md">The demo agent&apos;s playbook.md<IconUpRight /></a>
@@ -160,7 +160,7 @@ export default function ConnectPage() {
 
       <section id="owner-setup" className="lite-section owner-setup" aria-labelledby="owner-setup-title">
         <h2 id="owner-setup-title" className="t-name">Create the NEAR agent</h2>
-        <p className="t-small is-lead">The owner signs the agent&apos;s rules and one grant with a passkey; after that Chance Lite acts only inside those rules.</p>
+        <p className="t-small is-lead">The owner signs the agent&apos;s rules and one grant with a passkey; after that ChanceNear acts only inside those rules.</p>
         <OwnerSetup />
       </section>
     </div>

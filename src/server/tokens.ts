@@ -22,7 +22,7 @@ export function snapshotTokens(): AssetRef[] {
 
 export async function tokens(): Promise<{ list: AssetRef[]; live: boolean }> {
   if (cache && Date.now() - cache.at < TTL) return cache;
-  if (process.env.CHANCE_LITE_OFFLINE === "1") {
+  if (process.env.CHANCENEAR_OFFLINE === "1") {
     cache = { at: Date.now(), list: snapshotTokens(), live: false };
     return cache;
   }

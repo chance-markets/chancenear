@@ -38,11 +38,25 @@ export async function proposeLive(s: Scenario, lessons: Lesson[], agent: string)
     ["ETH", "eth", "nep141:eth.omft.near"],
   ].map(([sym, chain, id]) => `- ${sym} on ${chainName(chain)}: ${id}`).join("\n");
   const active = lessons.filter((l) => l.active);
-  const playbook = active.length ? `\nYour playbook (lessons from your own past mistakes, follow them):\n${renderPlaybook(agent, active).split("\n").filter((l) => !l.startsWith("# ") && !l.startsWith("Lessons Chance Lite")).join("\n")}\n` : "";
+  const playbook = active.length ? `\nYour playbook (lessons from your own past mistakes, follow them):\n${renderPlaybook(agent, active).split("\n").filter((l) => !l.startsWith("# ") && !l.startsWith("Lessons ChanceNear")).join("\n")}\n` : "";
   const balances = Object.entries(s.balances).map(([id, v]) => `${id}: ${v}`).join("\n");
   const read = s.context.filter((c) => c.role !== "user").map((c) => `[${c.role}${c.source ? ` from ${c.source}` : ""}]\n${c.content}`).join("\n\n");
   const user = `User request: ${s.intent}\n\nYour balances (atomic units):\n${balances}${read ? `\n\nWhat you read while working on it:\n${read}` : ""}`;
-  const r = await chatJson<{ type: ProposedAction["type"]; params: Record<string, unknown>; reasoning?: string }>({ model: AGENT_MODEL, system: AGENT_SYSTEM(assets, playbook), user, temperature: 0.2, maxTokens: 600 });
-  const d = r.data;
-  return { action: { type: d.type, params: d.params ?? {} }, reasoning: d.reasoning, model: r.model };
+  // Thinking off: a reasoning model otherwise spends its whole budget thinking and never writes the action. One retry
+  // if the reply still isn't a usable action, so the rehearsal measures the agent's judgment, not a transport hiccup.
+  let last: unknown;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const r = await chatJson<{ type: ProposedAction["type"]; params: Record<string, unknown>; reasoning?: string }>({
+        model: AGENT_MODEL, system: AGENT_SYSTEM(assets, playbook), user, temperature: 0.2, maxTokens: 900,
+        extra: { chat_template_kwargs: { enable_thinking: false } },
+      });
+      const d = r.data;
+      if (!d || !["swap", "transfer", "withdraw", "limit_order"].includes(d.type) || !d.params || typeof d.params !== "object") throw new Error("the reply was not an Agent API action");
+      return { action: { type: d.type, params: d.params }, reasoning: d.reasoning, model: r.model };
+    } catch (e) {
+      last = e;
+    }
+  }
+  throw last instanceof Error ? last : new Error(String(last));
 }

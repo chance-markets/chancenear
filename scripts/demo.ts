@@ -1,5 +1,5 @@
 /**
- * The self-improvement loop in one command: a practice agent runs the scenario suite for a few rounds, Chance Lite
+ * The self-improvement loop in one command: a practice agent runs the scenario suite for a few rounds, ChanceNear
  * judges every action, every mistake becomes a lesson, and the mistakes per round fall.
  *
  *   npm run demo                   scripted agent, offline, reproducible
@@ -15,7 +15,7 @@ const args = process.argv.slice(2);
 const live = args.includes("--live");
 const ri = args.indexOf("--rounds");
 const rounds = ri >= 0 ? Number(args[ri + 1]) || 3 : 3;
-if (!live) process.env.CHANCE_LITE_OFFLINE = "1";
+if (!live) process.env.CHANCENEAR_OFFLINE = "1";
 if (live && !process.env.NEAR_AI_API_KEY) {
   console.log("--live needs NEAR_AI_API_KEY (in the environment or .env.local). Running the scripted agent instead.");
 }
@@ -24,7 +24,7 @@ const db = memoryStore();
 const started = Date.now();
 const r = await startRehearsal({ mode: live ? "live" : "scripted", rounds, store: db, wait: true });
 
-console.log(`Chance Lite rehearsal: ${r.mode === "live" ? `${r.agent_model} plays the agent, NEAR AI judges` : "scripted agent, deterministic judge, offline"}`);
+console.log(`ChanceNear rehearsal: ${r.mode === "live" ? `${r.agent_model} plays the agent, NEAR AI judges` : "scripted agent, deterministic judge, offline"}`);
 for (const round of r.rounds) {
   console.log(`\nRound ${round.round}`);
   for (const s of round.scenarios) {

@@ -13,7 +13,7 @@ export async function GET() {
       agent_api: agentApi,
       store: store().kind,
       tokens: { live: t.live, count: t.list.length },
-      execution: Boolean(process.env.CHANCE_LITE_ADMIN_TOKEN) && agentApi.grant,
+      execution: Boolean(process.env.CHANCENEAR_ADMIN_TOKEN) && agentApi.grant,
     });
   } catch (e) {
     return fail(e);

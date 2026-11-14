@@ -1,16 +1,16 @@
 import { origin } from "@/server/http";
 
-/** A skill file any agent can load: how to work with Chance Lite before touching the NEAR Intents Agent API. */
+/** A skill file any agent can load: how to work with ChanceNear before touching the NEAR Intents Agent API. */
 export function GET(req: Request) {
   const base = origin(req);
   const body = `---
-name: chance-lite
-description: Check every NEAR Intents Agent API action with Chance Lite before sending it, and load your playbook of lessons from past mistakes.
+name: chancenear
+description: Check every NEAR Intents Agent API action with ChanceNear before sending it, and load your playbook of lessons from past mistakes.
 ---
 
-# Chance Lite
+# ChanceNear
 
-Chance Lite judges an agent's NEAR Intents action before any funds move, and teaches the agent from its own mistakes.
+ChanceNear judges an agent's NEAR Intents action before any funds move, and teaches the agent from its own mistakes.
 
 ## Every session
 
@@ -19,7 +19,7 @@ Chance Lite judges an agent's NEAR Intents action before any funds move, and tea
 
 ## Before every swap, transfer, withdraw or limit order
 
-2. Send the exact Agent API body to Chance Lite first:
+2. Send the exact Agent API body to ChanceNear first:
 
 \`\`\`bash
 curl -s ${base}/api/v1/check -H 'Content-Type: application/json' -d '{

@@ -21,7 +21,7 @@ const FILTERS: TabOption<Filter>[] = [
 
 interface AgentRow { agent: string; judged: number; lessons: number; last_at: string | null }
 
-/** Every proposal Chance Lite judged, newest first, fresh every few seconds. */
+/** Every proposal ChanceNear judged, newest first, fresh every few seconds. */
 export default function Verdicts() {
   const [filter, setFilter] = useState<Filter>("all");
   const [agent, setAgent] = useState("");

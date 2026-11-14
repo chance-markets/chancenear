@@ -1,8 +1,8 @@
 /**
- * The contract between an agent, Chance Lite and the NEAR Intents Agent API.
+ * The contract between an agent, ChanceNear and the NEAR Intents Agent API.
  *
  * An agent proposes one Agent API action (the exact body it would send), together with the user's own words and what
- * it read on the way. Chance Lite judges it before any funds move and answers ALLOW, BLOCK or ESCALATE. Every judgment
+ * it read on the way. ChanceNear judges it before any funds move and answers ALLOW, BLOCK or ESCALATE. Every judgment
  * is stored; every mistake becomes a lesson the agent reads back before its next action.
  */
 
@@ -43,7 +43,7 @@ export interface ProposedAction {
 }
 
 export interface Proposal {
-  /** Chance Lite agent id (a slug). Lessons and stats are kept per agent. */
+  /** ChanceNear agent id (a slug). Lessons and stats are kept per agent. */
   agent: string;
   /** The user's own instruction, verbatim. The judge holds the action to this. */
   intent: string;

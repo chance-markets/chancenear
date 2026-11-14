@@ -30,7 +30,7 @@ export interface ChatResult<T> {
 }
 
 /** One completion that must answer with a JSON object. Retries once without response_format if the model refuses it. */
-export async function chatJson<T>(opts: { model?: string; system: string; user: string; maxTokens?: number; temperature?: number }): Promise<ChatResult<T>> {
+export async function chatJson<T>(opts: { model?: string; system: string; user: string; maxTokens?: number; temperature?: number; extra?: Record<string, unknown> }): Promise<ChatResult<T>> {
   const key = process.env.NEAR_AI_API_KEY;
   if (!key) throw new Error("NEAR_AI_API_KEY is not set");
   const model = opts.model || JUDGE_MODEL;
@@ -44,6 +44,7 @@ export async function chatJson<T>(opts: { model?: string; system: string; user: 
       ],
       temperature: opts.temperature ?? 0,
       max_tokens: opts.maxTokens ?? 1400,
+      ...(opts.extra ?? {}),
     };
     if (format) body.response_format = { type: "json_object" };
     const requestBody = JSON.stringify(body);

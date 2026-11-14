@@ -7,12 +7,12 @@
 export type ThemePref = "light" | "dark" | "system";
 export type Theme = "light" | "dark";
 
-export const THEME_COOKIE = "chance_lite_theme";
+export const THEME_COOKIE = "chancenear_theme";
 /** Each theme's page grey (--color-surface-0), for a phone browser's bar. */
 export const THEME_BAR: Record<Theme, string> = { light: "#f5f5f5", dark: "#0c0c0b" };
 export const isThemePref = (v: unknown): v is ThemePref => v === "light" || v === "dark" || v === "system";
 
-const CHANGED = "chance-lite-theme";
+const CHANGED = "chancenear-theme";
 export const DARK_QUERY = "(prefers-color-scheme: dark)";
 
 /** The choice on this page (light until someone picks another). */

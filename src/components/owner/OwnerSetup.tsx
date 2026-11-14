@@ -42,7 +42,7 @@ export function OwnerSetup() {
     if (s.owner && s.owner.origin === location.origin) setOwner(s.owner);
     else {
       try {
-        const saved = localStorage.getItem("chance-lite-owner");
+        const saved = localStorage.getItem("chancenear-owner");
         const o = saved ? (JSON.parse(saved) as Owner) : null;
         if (o && o.origin === location.origin) setOwner(o);
       } catch {
@@ -62,8 +62,8 @@ export function OwnerSetup() {
     if (location.protocol !== "https:") throw new Error("Passkey owners need this site on HTTPS. Open the deployed site to create the agent.");
     const r = await startRegistration({
       optionsJSON: {
-        rp: { id: location.hostname, name: "Chance Lite" },
-        user: { id: random(16), name: `chance-lite-owner-${new Date().toISOString().slice(0, 10)}`, displayName: "Chance Lite owner" },
+        rp: { id: location.hostname, name: "ChanceNear" },
+        user: { id: random(16), name: `chancenear-owner-${new Date().toISOString().slice(0, 10)}`, displayName: "ChanceNear owner" },
         challenge: random(32),
         pubKeyCredParams: [{ type: "public-key", alg: -7 }],
         authenticatorSelection: { userVerification: "required", residentKey: "preferred" },
@@ -73,7 +73,7 @@ export function OwnerSetup() {
     });
     if (!r.response.publicKey) throw new Error("This passkey didn't share its public key. Try another device or browser.");
     const o = { credential_id: r.id, public_key: r.response.publicKey, rp_id: location.hostname, origin: location.origin };
-    try { localStorage.setItem("chance-lite-owner", JSON.stringify(o)); } catch { /* fine */ }
+    try { localStorage.setItem("chancenear-owner", JSON.stringify(o)); } catch { /* fine */ }
     setOwner(o);
   });
 
@@ -104,13 +104,13 @@ export function OwnerSetup() {
       <ol className="owner-steps">
         <li data-done={owner ? true : undefined}>A passkey on this site becomes the owner</li>
         <li data-done={state.agent_id ? true : undefined}>The owner signs the agent&apos;s rules</li>
-        <li data-done={state.granted ? true : undefined}>The owner lets Chance Lite act inside them</li>
+        <li data-done={state.granted ? true : undefined}>The owner lets ChanceNear act inside them</li>
         <li>Fund it with USDC on Base</li>
       </ol>
 
       {prepared ? (
         <div className="card-sunk owner-preview">
-          <p className="t-label">{prepared.type === "agent_create" ? "You're about to create the agent" : "You're about to let Chance Lite act for it"}</p>
+          <p className="t-label">{prepared.type === "agent_create" ? "You're about to create the agent" : "You're about to let ChanceNear act for it"}</p>
           <p className="owner-summary">{prepared.p.preview?.summary ?? "The Agent API sent no preview."}</p>
           <label className="owner-agree">
             <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />

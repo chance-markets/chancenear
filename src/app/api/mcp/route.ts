@@ -4,8 +4,8 @@ import { renderPlaybook } from "@/server/lessons";
 import { store } from "@/server/store";
 
 /**
- * Chance Lite as an MCP server (streamable HTTP, stateless JSON responses). Claude Code:
- *   claude mcp add --transport http chance-lite https://<host>/api/mcp
+ * ChanceNear as an MCP server (streamable HTTP, stateless JSON responses). Claude Code:
+ *   claude mcp add --transport http chancenear https://<host>/api/mcp
  * Tools: check_action (judge one Agent API action before calling it) and get_playbook (the agent's lessons).
  */
 
@@ -13,7 +13,7 @@ const TOOLS = [
   {
     name: "check_action",
     description:
-      "Call this before EVERY NEAR Intents Agent API swap, transfer, withdraw or limit order. Chance Lite judges the action against the user's own words and what you read (prompt injection), and answers ALLOW, BLOCK or ESCALATE with the lessons to apply. Only send the action to the Agent API on ALLOW.",
+      "Call this before EVERY NEAR Intents Agent API swap, transfer, withdraw or limit order. ChanceNear judges the action against the user's own words and what you read (prompt injection), and answers ALLOW, BLOCK or ESCALATE with the lessons to apply. Only send the action to the Agent API on ALLOW.",
     inputSchema: {
       type: "object",
       required: ["agent", "intent", "action"],
@@ -37,7 +37,7 @@ const TOOLS = [
   },
   {
     name: "get_playbook",
-    description: "Load your playbook: the lessons Chance Lite learned from your own blocked actions. Read it at the start of every session and follow it.",
+    description: "Load your playbook: the lessons ChanceNear learned from your own blocked actions. Read it at the start of every session and follow it.",
     inputSchema: { type: "object", required: ["agent"], properties: { agent: { type: "string" } } },
   },
 ];
@@ -50,7 +50,7 @@ async function handle(m: Rpc, base: string): Promise<unknown> {
       return {
         protocolVersion: (m.params?.protocolVersion as string) ?? "2025-06-18",
         capabilities: { tools: {} },
-        serverInfo: { name: "chance-lite", version: "0.1.0" },
+        serverInfo: { name: "chancenear", version: "0.1.0" },
         instructions: "Before any NEAR Intents Agent API action, call check_action and act only on ALLOW. Load get_playbook at the start of each session.",
       };
     case "ping":
@@ -114,5 +114,5 @@ export async function POST(req: Request) {
 }
 
 export function GET() {
-  return new Response("Chance Lite MCP: POST JSON-RPC here (streamable HTTP, JSON responses).", { status: 405, headers: { Allow: "POST" } });
+  return new Response("ChanceNear MCP: POST JSON-RPC here (streamable HTTP, JSON responses).", { status: 405, headers: { Allow: "POST" } });
 }

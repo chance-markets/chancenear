@@ -1,4 +1,4 @@
-/** What Chance Lite can see on NEAR right now: the Agent API's health, its token list, and (with keys) the agent. */
+/** What ChanceNear can see on NEAR right now: the Agent API's health, its token list, and (with keys) the agent. */
 import { nearOverview } from "../src/server/near-intents";
 import { tokens } from "../src/server/tokens";
 import { JUDGE_MODEL, nearAiConfigured } from "../src/server/near-ai";

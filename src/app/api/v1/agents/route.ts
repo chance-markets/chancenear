@@ -1,7 +1,7 @@
 import { fail, json } from "@/server/http";
 import { store } from "@/server/store";
 
-/** Every agent Chance Lite has judged, with how much it has learned. */
+/** Every agent ChanceNear has judged, with how much it has learned. */
 export async function GET() {
   try {
     const [judgments, lessons] = await Promise.all([store().listJudgments({ limit: 5000 }), store().listLessons()]);

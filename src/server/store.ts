@@ -5,7 +5,7 @@ import type { Judgment, Lesson, Rehearsal, Verdict } from "@/lib/types";
 
 /**
  * Where judgments, lessons and rehearsals live. Postgres when DATABASE_URL is set (Railway); otherwise a JSON file
- * under CHANCE_LITE_DATA_DIR (default .data), so a fresh clone runs with no setup. Each record is stored whole as
+ * under CHANCENEAR_DATA_DIR (default .data), so a fresh clone runs with no setup. Each record is stored whole as
  * JSON with the columns we filter on beside it, so both stores answer the same questions the same way.
  */
 
@@ -33,8 +33,8 @@ export interface Store {
 interface FileData { judgments: Judgment[]; lessons: Lesson[]; rehearsals: Rehearsal[]; kv: Record<string, string> }
 
 function fileStore(persist = true): Store {
-  const dir = process.env.CHANCE_LITE_DATA_DIR || join(process.cwd(), ".data");
-  const path = join(dir, "chance-lite.json");
+  const dir = process.env.CHANCENEAR_DATA_DIR || join(process.cwd(), ".data");
+  const path = join(dir, "chancenear.json");
   let data: FileData = { judgments: [], lessons: [], rehearsals: [], kv: {} };
   try {
     if (persist && existsSync(path)) data = { ...data, ...JSON.parse(readFileSync(path, "utf8")) };
@@ -165,9 +165,9 @@ function pgStore(url: string): Store {
 
 /** One store per server process, kept on globalThis so dev reloads don't open a second one. */
 export function store(): Store {
-  const g = globalThis as unknown as { __chanceLiteStore?: Store };
-  if (!g.__chanceLiteStore) g.__chanceLiteStore = process.env.DATABASE_URL ? pgStore(process.env.DATABASE_URL) : fileStore();
-  return g.__chanceLiteStore;
+  const g = globalThis as unknown as { __chanceNearStore?: Store };
+  if (!g.__chanceNearStore) g.__chanceNearStore = process.env.DATABASE_URL ? pgStore(process.env.DATABASE_URL) : fileStore();
+  return g.__chanceNearStore;
 }
 
 /** Tests get a store of their own that never touches disk or a database. */

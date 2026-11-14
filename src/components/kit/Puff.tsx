@@ -5,7 +5,7 @@
  * Who speaks: the Privacy Agent for the private balance (it's Bunker's own), Trader for trading, Chief for the app,
  * the Guide only for Chance itself.
  */
-export type Who = "privacy" | "trader" | "chief" | "guide" | "scout" | "blank";
+export type Who = "privacy" | "trader" | "chief" | "guide" | "scout" | "blank" | "pick-tangerine";
 
 /** Poses that exist as renders. Anything else falls back to the character's idle. */
 const POSES: Record<Who, string[]> = {
@@ -15,6 +15,7 @@ const POSES: Record<Who, string[]> = {
   guide: ["idle", "hello", "lens-empty", "look", "phone", "thinking"],
   scout: ["idle", "hello", "asking", "asleep", "cheer", "research"],
   blank: ["tada"],
+  "pick-tangerine": ["idle"],
 };
 
 /** Renders made for Bunker land here once generated; until then the character stands in its idle. */

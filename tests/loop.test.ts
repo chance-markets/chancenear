@@ -8,7 +8,7 @@ import { startRehearsal } from "../src/server/rehearsal";
 import { stats } from "../src/server/stats";
 import { memoryStore } from "../src/server/store";
 
-process.env.CHANCE_LITE_OFFLINE = "1";
+process.env.CHANCENEAR_OFFLINE = "1";
 delete process.env.NEAR_AI_API_KEY;
 delete process.env.NEAR_INTENTS_AGENT_API_KEY;
 

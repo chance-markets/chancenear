@@ -6,7 +6,7 @@ import { store } from "./store";
 /**
  * The owner flow for the demo agent: a passkey owner on this site's HTTPS origin signs twice.
  * 1. agent_create installs a tight policy (below) and gives the agent its own NEAR Intents wallet.
- * 2. grant_issue lets Chance Lite's backend act for it. The grant token is made here and never leaves the server;
+ * 2. grant_issue lets ChanceNear's backend act for it. The grant token is made here and never leaves the server;
  *    the owner signs only its SHA-256 commitment.
  * Then a deposit address funds it from Base. The partner key never reaches the browser.
  */
@@ -42,7 +42,7 @@ export async function ownerState() {
 
 export async function prepareCreate(owner: PasskeyOwner) {
   const generated = await client().generateIntent(
-    { type: "agent_create", name: "Chance Lite demo trader", external_user_id: "chance-lite-demo", owner: { type: "passkey", ...owner }, policy: demoPolicy() },
+    { type: "agent_create", name: "ChanceNear demo trader", external_user_id: "chancenear-demo", owner: { type: "passkey", ...owner }, policy: demoPolicy() },
     { idempotencyKey: createIdempotencyKey() },
   );
   await store().setKv(KV.pending, generated.correlation_id);
@@ -57,7 +57,7 @@ export async function prepareGrant() {
   const cred = createGrantCredential();
   await store().setKv(KV.pendingGrant, cred.token);
   const expires = new Date(Date.now() + 90 * 24 * 3600_000).toISOString();
-  const generated = await client().generateIntent({ type: "grant_issue", agent_id: agentId, label: "Chance Lite judge", credential: cred.commitment, expires_at: expires });
+  const generated = await client().generateIntent({ type: "grant_issue", agent_id: agentId, label: "ChanceNear judge", credential: cred.commitment, expires_at: expires });
   await store().setKv(KV.pending, generated.correlation_id);
   return { correlation_id: generated.correlation_id, intent: generated.intent, preview: generated.preview, expires_at: generated.expires_at };
 }

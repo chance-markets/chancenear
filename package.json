@@ -1,8 +1,8 @@
 {
-  "name": "chance-lite",
+  "name": "chancenear",
   "version": "0.1.0",
   "private": true,
-  "description": "Chance Lite: a pre-execution judge and self-improvement loop for AI agents on the NEAR Intents Agent API, judged by NEAR AI Cloud.",
+  "description": "ChanceNear: a pre-execution judge and self-improvement loop for AI agents on the NEAR Intents Agent API, judged by NEAR AI Cloud.",
   "license": "MIT",
   "type": "module",
   "scripts": {

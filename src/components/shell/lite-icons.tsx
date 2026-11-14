@@ -1,5 +1,5 @@
 /**
- * Chance Lite's own place icons, drawn on the house grid (24, filled, round joins): things are filled, directions are
+ * ChanceNear's own place icons, drawn on the house grid (24, filled, round joins): things are filled, directions are
  * drawn. Used beside the kit's set.
  */
 import type { SVGProps } from "react";
@@ -33,6 +33,15 @@ export function IconRounds(props: P) {
       <path fill="currentColor" d="M3.6 6.4c0-1 .8-1.8 1.8-1.8h1.4c1 0 1.8.8 1.8 1.8v14.2H3.6z" />
       <path fill="currentColor" d="M9.8 11c0-1 .8-1.8 1.8-1.8H13c1 0 1.8.8 1.8 1.8v9.6h-5z" />
       <path fill="currentColor" d="M16 15.6c0-1 .8-1.8 1.8-1.8h1.4c1 0 1.8.8 1.8 1.8v5H16z" />
+    </Svg>
+  );
+}
+
+/** How it works: a filled round button with a play mark cut out of it. */
+export function IconPlay(props: P) {
+  return (
+    <Svg {...props}>
+      <path fill="currentColor" fillRule="evenodd" d="M12 2.6a9.4 9.4 0 1 1 0 18.8 9.4 9.4 0 0 1 0-18.8zM10.4 8.2c-.6-.4-1.4 0-1.4.7v6.2c0 .7.8 1.1 1.4.7l4.7-3.1c.5-.3.5-1.1 0-1.4z" />
     </Svg>
   );
 }

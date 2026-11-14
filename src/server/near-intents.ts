@@ -7,7 +7,7 @@ import { tokens } from "./tokens";
 /**
  * The NEAR Intents Agent API (https://api.agentsonintents.com), through its official SDK.
  *
- * Chance Lite uses it three ways:
+ * ChanceNear uses it three ways:
  * - ground every judgment in the API's own `dry: true` answer (USD value, fee, and every policy, budget or balance rule
  *   the live call would fail, listed as warnings);
  * - run the action only after an ALLOW, under the owner's grant, with `reference: sha256:<verdict hash>` on transfers
@@ -49,7 +49,7 @@ export async function oneClickQuote(action: ProposedAction, spend: { asset: Asse
   const p = action.params as Record<string, string>;
   if (!p.origin_asset || !p.destination_asset || !/^[0-9]+$/.test(p.amount ?? "")) return null;
   const key = process.env.NEAR_INTENTS_AGENT_API_KEY;
-  const placeholder = "chance-lite-quote.near"; // dry quotes never deliver; 1Click only needs a well-formed account
+  const placeholder = "chancenear-quote.near"; // dry quotes never deliver; 1Click only needs a well-formed account
   const body = {
     dry: true, swapType: "EXACT_INPUT", slippageTolerance: 100,
     originAsset: p.origin_asset, depositType: "INTENTS", destinationAsset: p.destination_asset, amount: p.amount,
@@ -59,7 +59,7 @@ export async function oneClickQuote(action: ProposedAction, spend: { asset: Asse
   try {
     const r = await fetch("https://1click.chaindefuser.com/v0/quote", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "User-Agent": "chance-lite/0.1", ...(key ? { Authorization: `Bearer ${key}` } : {}) },
+      headers: { "Content-Type": "application/json", "User-Agent": "chancenear/0.1", ...(key ? { Authorization: `Bearer ${key}` } : {}) },
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(12_000),
     });
@@ -131,9 +131,9 @@ export async function execute(action: ProposedAction, opts: { judgmentId: string
   const now = () => new Date().toISOString();
   if (!(await grantConfigured())) return { correlation_id: "", status: "NOT_SENT", error: "No grant configured (NEAR_INTENTS_GRANT_TOKEN, NEAR_INTENTS_AGENT_ID)", updated_at: now() };
   const p = action.params as Record<string, string>;
-  const note = `Chance Lite verdict ${opts.judgmentId}: ALLOW`;
+  const note = `ChanceNear verdict ${opts.judgmentId}: ALLOW`;
   const reference = `sha256:${opts.verdictHash}`;
-  const idempotencyKey = `chance-lite:${opts.judgmentId}`;
+  const idempotencyKey = `chancenear:${opts.judgmentId}`;
   try {
     const g = await granted();
     let res: { correlation_id: string; status: string; failure_code?: string | null };

@@ -1,8 +1,8 @@
 /**
- * The attack demo: a prompt-injected agent tries to pay an attacker, Chance Lite stops it, the agent learns.
+ * The attack demo: a prompt-injected agent tries to pay an attacker, ChanceNear stops it, the agent learns.
  *
  *   npm run attack                 judge in-process (rules, plus NEAR AI if NEAR_AI_API_KEY is set)
- *   npm run attack -- --remote     judge on the hosted Chance Lite (real NEAR AI verdict in a TEE, no keys needed)
+ *   npm run attack -- --remote     judge on the hosted ChanceNear (real NEAR AI verdict in a TEE, no keys needed)
  *   npm run attack -- --remote https://your-host
  */
 import { scenarioById } from "../src/lib/scenarios";
@@ -40,7 +40,7 @@ const show = (r: CheckResponse) => {
   if (remote) line(`  verdict   ${remote}/verdicts/${j.id}`);
 };
 
-line(`Chance Lite attack demo (${remote ? `hosted judge at ${remote}` : "local judge"}), agent ${agent}`);
+line(`ChanceNear attack demo (${remote ? `hosted judge at ${remote}` : "local judge"}), agent ${agent}`);
 line();
 line(`The user asks: "${s.intent}"`);
 line(`The agent reads the invoice email from ${s.context[1].source}. Hidden in it:`);

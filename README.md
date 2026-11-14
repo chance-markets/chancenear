@@ -1,6 +1,6 @@
-# Chance Lite
+# ChanceNear
 
-Chance Lite checks every action an AI agent proposes on the **NEAR Intents Agent API** before any funds move, and
+ChanceNear checks every action an AI agent proposes on the **NEAR Intents Agent API** before any funds move, and
 turns every mistake it catches into a lesson the agent loads before its next action.
 
 - **Judge**: prompt-injection screening, intent match against the user's own words, the Agent API's own `dry: true`
@@ -48,7 +48,7 @@ already enforces the owner's numeric policy (assets, limits, USD budget, destina
    See `"verdict": "BLOCK"`, a finding *Wrong decimals for USDC* ("USDC uses 6 decimals ... this sends
    25,000,000,000,000 USDC"), `suggested.params.amount = "25000000"`, and `lessons[0]` telling the agent how to convert.
    Then `GET /api/v1/agents/readme-test/playbook.md` shows that lesson in the agent's playbook.
-4. MCP: `claude mcp add --transport http chance-lite https://web-production-a3b908a4.up.railway.app/api/mcp` gives
+4. MCP: `claude mcp add --transport http chancenear https://web-production-a3b908a4.up.railway.app/api/mcp` gives
    Claude Code the tools `check_action` and `get_playbook`.
 
 ### Locally (Node 22+, no keys needed)
@@ -68,7 +68,7 @@ npm run dev         # http://localhost:3000
 - `npm run demo`: see each scenario per round, "6 of 10 were mistakes" in round 1, 0 after, and the final playbook.
 
 With no keys the judge runs on its deterministic rules, token data comes from a bundled snapshot of the Agent API's
-public `GET /v1/tokens`, and records go to `.data/chance-lite.json`. Add keys in `.env.local` (see `.env.example`)
+public `GET /v1/tokens`, and records go to `.data/chancenear.json`. Add keys in `.env.local` (see `.env.example`)
 for NEAR AI verdicts, live dry-run quotes and execution.
 
 ## How NEAR is used
@@ -81,7 +81,7 @@ for NEAR AI verdicts, live dry-run quotes and execution.
   judge reads the API's own `spend.amount_usd`, `fee` and `warnings`. A warning the live call would fail (a
   `policy_*` code, `spend_budget_exceeded`, ...) becomes a blocking finding (`src/server/judge.ts`).
 - Live execution after `ALLOW` (`POST /api/v1/execute`, operator only) under the owner's grant
-  (`X-Grant-Token`), with `Idempotency-Key = chance-lite:<verdict id>`, a `note` naming the verdict, and on transfers
+  (`X-Grant-Token`), with `Idempotency-Key = chancenear:<verdict id>`, a `note` naming the verdict, and on transfers
   and withdrawals `reference = sha256:<verdict hash>`, which the Agent API records in its attested audit log and
   receipts. A receipt therefore proves which verdict authorized the payment.
 - Owner flow on the Connect page: a passkey on the site is the owner. `generate-intent` / `submit-intent` /
@@ -95,7 +95,7 @@ for NEAR AI verdicts, live dry-run quotes and execution.
 - The judge is a chat completion on `https://cloud-api.near.ai/v1` with a TEE-hosted model
   (`deepseek-ai/DeepSeek-V4.1-Flash-1017` by default; `NEAR_AI_MODEL`).
 - After each verdict, `GET /v1/signature/{chat_id}` returns the TEE's signature over
-  `model:sha256(request):sha256(response)`. Chance Lite recovers the EIP-191 signer, checks it equals
+  `model:sha256(request):sha256(response)`. ChanceNear recovers the EIP-191 signer, checks it equals
   `signing_address`, and checks both hashes against the exact bytes it sent and received. The verdict page shows the
   result.
 - In live rehearsals a second NEAR AI model (`Qwen/Qwen3.8-27B`; `NEAR_AI_AGENT_MODEL`) plays the agent, so the
@@ -135,7 +135,7 @@ from it; blocks).
 | Method | Path | What |
 | --- | --- | --- |
 | POST | `/api/v1/check` | Judge a proposal `{agent, intent, action: {type, params}, context?, mandate?, balances?, reasoning?}`. Never moves funds. |
-| POST | `/api/v1/execute` | Judge, then run on NEAR Intents on `ALLOW`. `Authorization: Bearer CHANCE_LITE_ADMIN_TOKEN`. |
+| POST | `/api/v1/execute` | Judge, then run on NEAR Intents on `ALLOW`. `Authorization: Bearer CHANCENEAR_ADMIN_TOKEN`. |
 | GET | `/api/v1/judgments`, `/api/v1/judgments/:id` | Verdicts, newest first (`agent`, `verdict`, `limit`, `cursor`). |
 | GET | `/api/v1/agents/:agent/playbook(.md)` | The agent's lessons as JSON or markdown. |
 | GET | `/api/v1/agents/:agent/dataset.jsonl?format=sft\|dpo` | Fine-tune export. |

@@ -9,7 +9,7 @@ import "./globals.css";
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "Chance Lite",
+  title: "ChanceNear",
   description: "A judge between AI agents and the NEAR Intents Agent API that learns from every mistake it stops.",
   icons: { icon: "/brand/icon_2.png" },
 };

@@ -124,8 +124,8 @@ function PlaybookView() {
             <Code label="Claude Code, .claude/settings.json" wrap>{hook}</Code>
           </div>
           <div className="how-step">
-            <p className="t-small">Or connect Claude Code to Chance Lite over MCP: tools <b>check_action</b> and <b>get_playbook</b>.</p>
-            <Code label="Terminal" wrap>{`claude mcp add --transport http chance-lite ${origin}/api/mcp`}</Code>
+            <p className="t-small">Or connect Claude Code to ChanceNear over MCP: tools <b>check_action</b> and <b>get_playbook</b>.</p>
+            <Code label="Terminal" wrap>{`claude mcp add --transport http chancenear ${origin}/api/mcp`}</Code>
           </div>
           <div className="how-step">
             <p className="t-small">Any other agent, a Grok bot for one: prepend the playbook, and check before every Agent API call.</p>

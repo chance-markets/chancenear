@@ -6,14 +6,15 @@ import { useEffect, useId, useRef, useState, type ComponentType, type SVGProps }
 import { IconApps, IconDesk, IconEdit, IconHistory } from "@/components/kit/house-icons";
 import { Tabs, type TabOption } from "@/components/kit/Tabs";
 import { setThemePref, type ThemePref } from "@/lib/theme";
-import { IconRounds, IconStamp } from "./lite-icons";
+import { IconPlay, IconRounds, IconStamp } from "./lite-icons";
 import { useThemePref } from "./ThemeProvider";
 
 type Glyph = ComponentType<SVGProps<SVGSVGElement> & { size?: number }>;
 interface Place { label: string; Icon: Glyph; href: string }
 
 const PLACES: Place[] = [
-  { label: "Overview", Icon: IconDesk, href: "/" },
+  { label: "How it works", Icon: IconPlay, href: "/" },
+  { label: "Dashboard", Icon: IconDesk, href: "/dashboard" },
   { label: "Verdicts", Icon: IconStamp, href: "/verdicts" },
   { label: "Playbook", Icon: IconHistory, href: "/playbook" },
   { label: "Rehearsal", Icon: IconRounds, href: "/rehearsal" },
@@ -48,12 +49,12 @@ export function Sidebar() {
   const theme = useThemePref();
   return (
     <aside className="side">
-      <Link href="/" className="side-brand" aria-label="Chance Lite, overview">
+      <Link href="/" className="side-brand" aria-label="ChanceNear, how it works">
         <Wordmark height={20} />
-        <span>Lite</span>
+        <span>Near</span>
       </Link>
       <PhoneMenu />
-      <nav className="places" aria-label="Chance Lite">
+      <nav className="places" aria-label="ChanceNear">
         {PLACES.map((p) => <PlaceRow key={p.href} p={p} path={path} />)}
       </nav>
       <div className="side-foot">

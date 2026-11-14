@@ -4,7 +4,7 @@ import { SCENARIOS } from "../src/lib/scenarios";
 import { judgeProposal } from "../src/server/judge";
 import { memoryStore } from "../src/server/store";
 
-process.env.CHANCE_LITE_OFFLINE = "1";
+process.env.CHANCENEAR_OFFLINE = "1";
 
 const opts = (store = memoryStore()) => ({ store, model: false, dryRun: false });
 

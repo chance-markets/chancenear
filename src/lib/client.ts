@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-/** A JSON call to Chance Lite's own API. Throws with the server's words when it answers with an error. */
+/** A JSON call to ChanceNear's own API. Throws with the server's words when it answers with an error. */
 export async function api<T>(path: string, init?: { method?: string; body?: unknown; signal?: AbortSignal }): Promise<T> {
   const r = await fetch(path, {
     method: init?.method ?? (init?.body !== undefined ? "POST" : "GET"),
@@ -114,7 +114,7 @@ export function useCopy(): [string | null, (key: string, text: string) => void] 
 
 /** This page's own origin, for snippets (the server renders a placeholder). */
 export function useOrigin(): string {
-  const [origin, setOrigin] = useState("https://<your-chance-lite>");
+  const [origin, setOrigin] = useState("https://<your-chancenear>");
   useEffect(() => setOrigin(window.location.origin), []);
   return origin;
 }

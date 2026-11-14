@@ -2,9 +2,10 @@
 @import "../styles/frame.css";
 @import "../styles/lite.css";
 @import "../styles/owner.css";
+@import "../styles/how.css";
 
 /*
- * Chance Lite on the Chance kit (Star Puffs in the chance.cc world), as in Chance Bunker, ported from ChanceBot's kit.css.
+ * ChanceNear on the Chance kit (Star Puffs in the chance.cc world), as in Chance Bunker, ported from ChanceBot's kit.css.
  *
  * 1. One page grey, white cards: tone separates things, never a border or a shadow.
  * 2. Ultramarine belongs to Chance: the word, the Guide, "Sign in with Chance". Never Send, a generic button, a link

@@ -36,7 +36,7 @@ export function limited(req: Request, perMinute = 30): Response | null {
 
 /** Live execution and owner actions are for the operator only. */
 export function isAdmin(req: Request): boolean {
-  const token = process.env.CHANCE_LITE_ADMIN_TOKEN;
+  const token = process.env.CHANCENEAR_ADMIN_TOKEN;
   if (!token) return false;
   const auth = req.headers.get("authorization") ?? "";
   return auth === `Bearer ${token}`;

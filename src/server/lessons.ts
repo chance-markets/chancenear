@@ -182,7 +182,7 @@ export function renderPlaybook(agent: string, lessons: Lesson[], origin = ""): s
   const lines = [
     `# Playbook for ${agent}`,
     "",
-    `Lessons Chance Lite learned from this agent's own blocked actions on NEAR Intents. Read them before every action, and send every action to ${origin || ""}/api/v1/check before calling the Agent API.`,
+    `Lessons ChanceNear learned from this agent's own blocked actions on NEAR Intents. Read them before every action, and send every action to ${origin || ""}/api/v1/check before calling the Agent API.`,
     "",
   ];
   if (!active.length) {
