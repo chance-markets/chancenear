@@ -40,12 +40,55 @@ export function estimate(spend: { asset: AssetRef; amount: number } | undefined,
 }
 
 /**
+ * A dry 1Click quote for a swap: the NEAR Intents solver market that Agent API swaps route through. Real liquidity,
+ * real output and the real cost of the trade, with the partner key from partners.near-intents.org as its JWT. Used when
+ * the Agent API itself can't answer (no agent yet, or the key isn't enabled there).
+ */
+export async function oneClickQuote(action: ProposedAction, spend: { asset: AssetRef; amount: number } | undefined): Promise<QuoteFacts | null> {
+  if (action.type !== "swap") return null;
+  const p = action.params as Record<string, string>;
+  if (!p.origin_asset || !p.destination_asset || !/^[0-9]+$/.test(p.amount ?? "")) return null;
+  const key = process.env.NEAR_INTENTS_AGENT_API_KEY;
+  const placeholder = "chance-lite-quote.near"; // dry quotes never deliver; 1Click only needs a well-formed account
+  const body = {
+    dry: true, swapType: "EXACT_INPUT", slippageTolerance: 100,
+    originAsset: p.origin_asset, depositType: "INTENTS", destinationAsset: p.destination_asset, amount: p.amount,
+    refundTo: placeholder, refundType: "INTENTS", recipient: placeholder, recipientType: "INTENTS",
+    deadline: new Date(Date.now() + 30 * 60_000).toISOString(),
+  };
+  try {
+    const r = await fetch("https://1click.chaindefuser.com/v0/quote", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "User-Agent": "chance-lite/0.1", ...(key ? { Authorization: `Bearer ${key}` } : {}) },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(12_000),
+    });
+    const d = (await r.json()) as { quote?: { amountOut?: string; amountInUsd?: string; amountOutUsd?: string }; message?: string };
+    if (!r.ok || !d.quote) return { ...estimate(spend), source: "one_click", error: d.message ?? `1Click ${r.status}`, warnings: [{ code: "quote_unavailable", detail: d.message ?? `1Click answered ${r.status}` }] };
+    const inUsd = d.quote.amountInUsd != null ? Number(d.quote.amountInUsd) : null;
+    const outUsd = d.quote.amountOutUsd != null ? Number(d.quote.amountOutUsd) : null;
+    const fee = inUsd != null && outUsd != null ? Math.max(0, inUsd - outUsd) : null;
+    const percent = fee != null && inUsd ? (fee / inUsd) * 100 : null;
+    return {
+      source: "one_click",
+      amount_usd: inUsd,
+      fee_usd: fee,
+      fee_percent: percent,
+      warnings: percent != null && percent > 5 ? [{ code: "high_fee", detail: `The trade loses ${percent.toFixed(1)}% between what goes in and what comes out.` }] : [],
+      amount_out: d.quote.amountOut ?? null,
+    };
+  } catch (e) {
+    return null;
+  }
+}
+
+/**
  * The Agent API's dry run for this action. Swaps and limit orders need only the partner key; a withdrawal preview
  * needs the grant and an Idempotency-Key; transfers have no dry form, so they get the price estimate.
  */
 export async function dryQuote(action: ProposedAction, spend: { asset: AssetRef; amount: number } | undefined, agent?: string): Promise<QuoteFacts> {
   const agentId = agent || (await demoAgentId());
-  if (!agentApiConfigured() || !agentId) return estimate(spend);
+  if (!agentApiConfigured() || !agentId) return (await oneClickQuote(action, spend)) ?? estimate(spend);
   const p = action.params as Record<string, string>;
   try {
     type Dry = { spend?: { amount_usd?: string | null }; fee?: { amount_usd?: string | null; percent?: string | null } | null; warnings?: { code: string; detail?: string }[]; quote?: Record<string, unknown> };
@@ -57,7 +100,7 @@ export async function dryQuote(action: ProposedAction, spend: { asset: AssetRef;
     } else if (action.type === "withdraw" && (await grantConfigured())) {
       q = (await (await granted()).withdraw(agentId, { asset: p.asset, amount: p.amount, chain: p.chain, recipient: p.recipient, ...(p.memo ? { memo: p.memo } : {}), dry: true })) as unknown as Dry;
     } else {
-      return estimate(spend);
+      return (await oneClickQuote(action, spend)) ?? estimate(spend);
     }
     const amountOut = q?.quote && typeof q.quote.amount_out === "string" ? (q.quote.amount_out as string) : null;
     return {
@@ -71,6 +114,11 @@ export async function dryQuote(action: ProposedAction, spend: { asset: AssetRef;
   } catch (e) {
     // A refusal before any provider call (unsupported token, invalid address, frozen, not ready) is itself a finding.
     const code = e instanceof AgentApiError ? e.code : undefined;
+    // The key or agent isn't usable on the Agent API: a 1Click quote still grounds a swap in real liquidity.
+    if (code === "invalid_api_key" || code === "api_key_retired" || code === "agent_not_found") {
+      const oc = await oneClickQuote(action, spend);
+      if (oc) return oc;
+    }
     const est = estimate(spend, errText(e));
     if (code) est.warnings.push({ code, detail: e instanceof AgentApiError ? e.detail : undefined });
     return est;

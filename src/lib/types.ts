@@ -92,7 +92,8 @@ export interface Resolved {
 
 /** The Agent API's own `dry: true` answer (or a local estimate when no partner key is set). */
 export interface QuoteFacts {
-  source: "agent_api" | "estimate";
+  /** agent_api: the Agent API's own dry run; one_click: a dry 1Click quote (the engine Agent API swaps route through). */
+  source: "agent_api" | "one_click" | "estimate";
   amount_usd: number | null;
   fee_usd: number | null;
   fee_percent: number | null;

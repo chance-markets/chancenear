@@ -154,11 +154,11 @@ export default function VerdictPage() {
 
       <div className="v-two">
         <section className="lite-section" aria-labelledby="quote">
-          <h2 id="quote" className="t-name">{v.quote?.source === "agent_api" ? "The Agent API's dry run" : "What it's worth"}</h2>
+          <h2 id="quote" className="t-name">{v.quote?.source === "agent_api" ? "The Agent API's dry run" : v.quote?.source === "one_click" ? "A live NEAR Intents quote" : "What it's worth"}</h2>
           <div className="group">
             {v.quote ? (
               <dl className="facts">
-                <dt>Source</dt><dd>{v.quote.source === "agent_api" ? "Agent API, dry: true" : "Estimate from token prices"}</dd>
+                <dt>Source</dt><dd>{v.quote.source === "agent_api" ? "Agent API, dry: true" : v.quote.source === "one_click" ? "1Click, dry: true" : "Estimate from token prices"}</dd>
                 <dt>Value</dt><dd>{fmtUsd(v.quote.amount_usd)}</dd>
                 <dt>Fee</dt><dd>{v.quote.fee_usd != null ? `${fmtUsd(v.quote.fee_usd)}${v.quote.fee_percent != null ? `, ${v.quote.fee_percent.toFixed(2)}%` : ""}` : "None stated"}</dd>
                 <dt>Warnings</dt><dd className="is-wrap">{v.quote.warnings.length ? v.quote.warnings.map((w) => w.code).join(", ") : "None"}</dd>

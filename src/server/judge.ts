@@ -132,6 +132,8 @@ function quoteFindings(q: QuoteFacts | undefined): Finding[] {
       out.push({ check: "quote", category: cat, severity: "high", title: `The Agent API would refuse it: ${w.code}`, detail: w.detail || "The live call would fail this rule of the owner's policy.", evidence: w.code });
     } else if (w.code === "high_fee") {
       out.push({ check: "quote", category: "excessive_cost", severity: "medium", title: "Fee above 5%", detail: w.detail || `The dry run values the fee at ${q.fee_percent ?? "?"}%.`, evidence: w.code });
+    } else if (w.code === "quote_unavailable") {
+      out.push({ check: "quote", category: "amount_error", severity: "low", title: "The market can't fill this", detail: w.detail ? `1Click answered: ${w.detail}.` : "No route could quote this trade.", evidence: w.code });
     } else if (w.code === "insufficient_balance") {
       out.push({ check: "quote", category: "amount_error", severity: "low", title: "The wallet holds less than this", detail: w.detail || "The live call would fail with insufficient_balance until the agent is funded.", evidence: w.code });
     }
