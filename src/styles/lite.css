@@ -589,7 +589,15 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 12px;
-  align-items: start;
+  align-items: stretch;
+}
+/* Side by side, the two cards share one height whatever each holds. */
+.v-two > section {
+  display: flex;
+  flex-direction: column;
+}
+.v-two > section > .group {
+  flex: 1;
 }
 .facts dd.is-wrap {
   white-space: normal;

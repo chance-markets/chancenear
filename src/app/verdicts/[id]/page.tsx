@@ -174,7 +174,7 @@ export default function VerdictPage() {
           <div className="group">
             <dl className="facts">
               <dt>Engine</dt><dd>{v.judge.engine === "near_ai" ? "NEAR AI Cloud" : "Rules"}</dd>
-              {v.judge.model ? <><dt>Model</dt><dd className="is-wrap">{v.judge.model}</dd></> : null}
+              {v.judge.model ? <><dt>Model</dt><dd className="is-wrap" title={v.judge.model}>{v.judge.model.split("/").pop()}</dd></> : null}
               <dt>Intent match</dt><dd>{pctOf(v.judge.intent_match)}</dd>
               <dt>Injection risk</dt><dd>{pctOf(v.judge.injection_risk)}</dd>
               <dt>Took</dt><dd>{(v.judge.latency_ms / 1000).toFixed(1)} s</dd>
