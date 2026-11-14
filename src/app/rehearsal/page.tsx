@@ -89,7 +89,7 @@ function RehearsalView() {
                   : r.status === "failed"
                     ? "This rehearsal stopped"
                     : first && last
-                      ? `${first.mistakes} mistakes in round 1, ${last.mistakes} in round ${last.round}`
+                      ? `${plural(first.mistakes, "mistake")} in round 1, ${last.mistakes} in round ${last.round}`
                       : "Done"}
               </span>
               <span className="t-small">
