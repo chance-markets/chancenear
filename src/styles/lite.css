@@ -1015,7 +1015,12 @@ a.lesson-link:hover {
     display: none;
   }
   .cat-row .row-text {
-    flex-basis: 128px;
+    flex-basis: 132px;
+  }
+  .cat-row .row-name {
+    white-space: normal;
+    font-size: 16px;
+    line-height: 1.3;
   }
   .rh-controls {
     grid-template-columns: minmax(0, 1fr);

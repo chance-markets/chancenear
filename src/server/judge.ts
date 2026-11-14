@@ -243,6 +243,11 @@ export async function judgeProposal(p: Proposal, opts: JudgeOptions = {}): Promi
 
   let judge: JudgeTrace = { engine: "rules", latency_ms: 0, intent_match: intent.match, injection_risk: inj.risk };
   let suggested = intent.suggested;
+  // A patched copy of an action the injected text steered can't be trusted: its other values may come from the
+  // attacker too. Keep a correction only when it was rebuilt from the user's own words (a different kind of action).
+  if (inj.tainted && suggested && suggested.type === p.action.type) {
+    suggested = { type: "refuse", message: `Don't send this: its ${p.action.type === "transfer" || p.action.type === "withdraw" ? "recipient or amount" : "values"} came from instructions in ${inj.spans[0]?.source ?? "untrusted content"}. Ask the user to confirm the payee and the amount before paying.` };
+  }
   let summary = "";
   const useModel = opts.model ?? (nearAiConfigured() && process.env.CHANCE_LITE_RULES_ONLY !== "1");
   if (useModel) {

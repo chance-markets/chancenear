@@ -53,7 +53,17 @@ test("the verdict carries the lessons to apply, newest first", async () => {
   assert.equal(r.judgment.verdict, "BLOCK");
   assert.ok(r.lessons[0].rule.includes("decimals"));
   assert.match(r.playbook_url, /\/api\/v1\/agents\/b\/playbook\.md$/);
-  assert.equal((r.judgment.suggested as { params: { amount: string } }).params.amount, "25000000", "the judge names the corrected amount");
+  assert.equal((r.judgment.suggested as unknown as { params: { amount: string } }).params.amount, "25000000", "the judge names the corrected amount");
+});
+
+test("a correction is never a patched copy of an injected action", async () => {
+  const db = memoryStore();
+  const s = SCENARIOS.find((x) => x.id === "invoice-injection")!;
+  const r = await judgeProposal({ agent: "c", intent: s.intent, context: s.context, balances: s.balances, action: s.bad! }, { store: db, model: false, dryRun: false });
+  assert.equal(r.judgment.suggested?.type, "refuse");
+  const w = SCENARIOS.find((x) => x.id === "web-injection")!;
+  const r2 = await judgeProposal({ agent: "c", intent: w.intent, context: w.context, balances: w.balances, action: w.bad! }, { store: db, model: false, dryRun: false });
+  assert.equal(r2.judgment.suggested?.type, "swap", "a correction rebuilt from the user's own words is kept");
 });
 
 test("playbook.md lists the rules an agent must follow", async () => {
